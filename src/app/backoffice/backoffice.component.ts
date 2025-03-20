@@ -1,16 +1,17 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { User } from '../models/user.model';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { UserService } from '../services/user.service';
 import { Router } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { ConfirmDialogComponent } from '../confirmDialog/confirm-dialog.component';
 import { UserCreateComponent } from '../components/user-create/user-create.component';
+import { UserEditComponent } from '../components/user-edit/user-edit.component';
 
 @Component({
   selector: 'app-backoffice',
-  imports: [CommonModule, FormsModule, UserCreateComponent],
+  imports: [CommonModule, FormsModule, UserCreateComponent,ReactiveFormsModule, UserEditComponent],
   templateUrl: './backoffice.component.html',
   styleUrl: './backoffice.component.css',
   standalone: true
@@ -100,49 +101,64 @@ export class BackOfficeComponent implements OnInit {
 
   // Editar usuario
   editarUsuario(user: User) {
-    try {
+    const dialogRef = this.dialog.open(UserEditComponent, { 
+      width: '400px',
+      data: user
+    });
+    
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        console.log('Usuario editado con éxito',result);
+        this.obtenerUsuarios();
+      }
+    });
+    /* try {
       // Comprobamos si la ruta existe
       this.router.navigate(['/users/edit', user.id]);
     } catch (error) {
       console.error('Error al navegar a la página de edición:', error);
       alert('La funcionalidad de edición de usuarios está en desarrollo.');
-    }
+    }*/
   }
 
-  // Marcar usuario como invisible (soft delete mediante actualización directa)
   marcarUsuarioInvisible(user: User) {
-    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
-      width: '300px',
-      data: { 
-        title: 'Confirmar acción', 
-        message: '¿Estás seguro de que deseas ocultar este usuario?' 
-      }
-    });
-    
-    dialogRef.afterClosed().subscribe(result => {
-      if (result) {
-        // Actualizar el usuario para marcarlo como invisible
-        const userData = {
-          visible: false
-        };
-        
-        this.userService.updateUser(user.id, userData).subscribe({
-          next: () => {
-            console.log('Usuario ocultado con éxito');
-            // Actualizar la lista de usuarios
-            this.obtenerUsuarios();
-            // Mostrar mensaje de éxito
-            alert('Usuario ocultado con éxito');
-          },
-          error: (error) => {
-            console.error('Error al ocultar el usuario:', error);
-            alert('Error al ocultar el usuario. Por favor, inténtalo de nuevo.');
-          }
-        });
-      }
-    });
+  // Verificar que tenemos el ID del usuario
+  if (!user || !user.id) {
+    console.error('ID de usuario no válido');
+    alert('Error: No se pudo identificar el usuario');
+    return;
   }
 
+  const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+    width: '300px',
+    data: { 
+      title: 'Ocultar Usuario',
+      message: `¿Estás seguro de que deseas ocultar al usuario ${user.username}?` 
+    }
+  });
+  
+  dialogRef.afterClosed().subscribe(result => {
+    if (result) {
+      // Enviamos el ID y el estado visible:false
+      const userData = { 
+        id: user.id,
+        visible: false 
+      };
+      
+      this.userService.updateUser(user.id, userData).subscribe({
+        next: () => {
+          console.log(`Usuario ${user.id} ocultado correctamente`);
+          alert('Usuario ocultado correctamente');
+          this.obtenerUsuarios();
+        },
+        error: (error) => {
+          console.error(`Error al ocultar usuario ${user.id}:`, error);
+          alert('Error al ocultar el usuario');
+        }
+      });
+    }
+  });
+}
   // Eliminar usuario (soft delete mediante API deleteUser)
   eliminarUsuario(user: User) {
     const dialogRef = this.dialog.open(ConfirmDialogComponent, {
