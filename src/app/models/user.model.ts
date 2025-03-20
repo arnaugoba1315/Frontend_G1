@@ -1,7 +1,9 @@
 export interface User {
     id: number;
-    name: string;
-    age: number;
+    username: string;
+    bio: string;
+    profilePicture: string;
+    level: number;
     email: string;
   }
 export class User implements User {
