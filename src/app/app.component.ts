@@ -1,16 +1,20 @@
 import { Component } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { RouterOutlet } from '@angular/router';
-
-import { NavigateComponent } from './components/navigate/navigate.component';
+import { BackOfficeComponent } from "./backoffice/backoffice.component";
+import { LoginComponent } from "./login/login.component";
+import { RegisterComponent } from "./register/register.component";
 
 @Component({
   selector: 'app-root',
-  standalone: true,
-  imports: [CommonModule, RouterOutlet, NavigateComponent],
+  imports: [RouterOutlet, BackOfficeComponent, LoginComponent, RegisterComponent],
   templateUrl: './app.component.html',
-  styleUrls: ['./app.component.css']
+  styleUrl: './app.component.css',
+  standalone: true
+  
 })
 export class AppComponent {
-  title = 'ea-exercise-angular';
+  loggedin: boolean = false;
+  getLoggedIn(loggedin: boolean){
+    this.loggedin = loggedin;
+  }
 }
