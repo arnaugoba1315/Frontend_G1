@@ -1,25 +1,58 @@
-<div class="boton-container">
-    <button (click)="obtenerUsuarios()" class="listar-boton">
-        Listar todos los usuarios
-    </button>
-</div>
-<div class="listar-container">
-
-    <p>
-        Escribe el filtrado de usuarios: <input type="text" [(ngModel)]="query">
-    </p>
-
-    <div *ngIf="users.length > 0">
-        <div *ngFor="let user of (users | nombre:query); let i = index; trackBy: trackByUserId">
-            <h2 (click)="changeName(user.name)">Nombre del usuario: {{user.name}}</h2>
-            <p>Edad del usuario: {{user.age}}</p>
-            <p>Email del usuario: {{user.email}}</p>
-            <button (click)="deleteUser(i)" class="listar-boton">
-                Borrar
-            </button>
+<!-- colaboradores.component.html -->
+<div class="users-container">
+    <!-- Selector de registros por página -->
+    <div class="page-options">
+      <label for="itemsPerPage">Usuarios por página:</label>
+      <select id="itemsPerPage" [(ngModel)]="itemsPerPage" (change)="cambiarRegistrosPorPagina()">
+        <option value="5">5</option>
+        <option value="10">10</option>
+        <option value="15">15</option>
+        <option value="20">20</option>
+      </select>
+    </div>
+  
+    <!-- Lista de usuarios -->
+    <div class="users-grid">
+      <div *ngFor="let user of users; let i = index; trackBy: trackByUserId" class="user-card">
+        <h3 class="user-name">{{user.name}}</h3>
+        <div class="user-details">
+          <p><strong>Email:</strong> {{user.email}}</p>
+          <p><strong>Nivel:</strong> {{user.level || 'No especificado'}}</p>
+          <p><strong>Bio:</strong> {{user.bio || 'Sin biografía'}}</p>
+          <img [src]="user.profilePicture || 'assets/default-profile.png'" alt="Foto de perfil" class="profile-image">
         </div>
+        <div class="user-actions">
+          <button (click)="editUser(user)" class="edit-boton">Editar</button>
+          <button (click)="deleteUser(i)" class="delete-boton">Borrar</button>
+        </div>
+      </div>
     </div>
-    <div *ngIf="users.length === 0">
-        <h2>No hay usuarios</h2>
+  
+    <!-- Paginación -->
+    <div class="pagination-controls">
+      <button 
+        class="pagination-btn" 
+        [disabled]="currentPage === 1" 
+        (click)="changePage(currentPage - 1)">
+        « Anterior
+      </button>
+      
+      <span *ngFor="let page of pages" 
+        class="page-number" 
+        [class.active]="page === currentPage"
+        (click)="changePage(page)">
+        {{page}}
+      </span>
+      
+      <button 
+        class="pagination-btn" 
+        [disabled]="currentPage === totalPages" 
+        (click)="changePage(currentPage + 1)">
+        Siguiente »
+      </button>
     </div>
-</div>
+    
+    <div class="pagination-info">
+      Mostrando página {{currentPage}} de {{totalPages}} ({{totalItems}} usuarios en total)
+    </div>
+  </div>

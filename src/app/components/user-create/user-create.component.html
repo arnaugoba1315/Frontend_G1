@@ -1,0 +1,120 @@
+<div class="user-create-container">
+  <div class="header-with-back">
+    <button type="button" class="btn-back" (click)="cancel()">
+      <i class="material-icons">arrow_back</i> Volver
+    </button>
+    <h2>Crear Nuevo Usuario</h2>
+  </div>
+
+  <form [formGroup]="userForm" (ngSubmit)="onSubmit()">
+    <div *ngIf="error" class="alert alert-danger">{{ error }}</div>
+    
+    <div class="form-group">
+      <label for="username">Nombre de usuario*</label>
+      <input 
+        type="text" 
+        id="username"
+        formControlName="username" 
+        class="form-control" 
+        [ngClass]="{ 'is-invalid': hasError('username', 'required') || hasError('username', 'minlength') }" 
+      />
+      <div *ngIf="hasError('username', 'required')" class="invalid-feedback">
+        El nombre de usuario es obligatorio
+      </div>
+      <div *ngIf="hasError('username', 'minlength')" class="invalid-feedback">
+        El nombre de usuario debe tener al menos 4 caracteres
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="email">Email*</label>
+      <input 
+        type="email" 
+        id="email"
+        formControlName="email" 
+        class="form-control" 
+        [ngClass]="{ 'is-invalid': hasError('email', 'required') || hasError('email', 'email') }" 
+      />
+      <div *ngIf="hasError('email', 'required')" class="invalid-feedback">
+        El email es obligatorio
+      </div>
+      <div *ngIf="hasError('email', 'email')" class="invalid-feedback">
+        Ingresa un email válido
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="password">Contraseña*</label>
+      <input 
+        type="password" 
+        id="password"
+        formControlName="password" 
+        class="form-control" 
+        [ngClass]="{ 'is-invalid': hasError('password', 'required') || hasError('password', 'minlength') }" 
+      />
+      <div *ngIf="hasError('password', 'required')" class="invalid-feedback">
+        La contraseña es obligatoria
+      </div>
+      <div *ngIf="hasError('password', 'minlength')" class="invalid-feedback">
+        La contraseña debe tener al menos 6 caracteres
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group form-group-half">
+        <label for="level">Nivel*</label>
+        <input 
+          type="number" 
+          id="level"
+          formControlName="level" 
+          class="form-control" 
+          [ngClass]="{ 'is-invalid': hasError('level', 'required') || hasError('level', 'min') }" 
+        />
+        <div *ngIf="hasError('level', 'required')" class="invalid-feedback">
+          El nivel es obligatorio
+        </div>
+        <div *ngIf="hasError('level', 'min')" class="invalid-feedback">
+          El nivel debe ser al menos 1
+        </div>
+      </div>
+      
+      <div class="form-group form-group-half">
+        <label for="profilePicture">URL de la imagen de perfil</label>
+        <input 
+          type="text" 
+          id="profilePicture"
+          formControlName="profilePicture" 
+          class="form-control" 
+        />
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="bio">Biografía</label>
+      <textarea 
+        id="bio"
+        formControlName="bio" 
+        class="form-control" 
+        rows="3"
+      ></textarea>
+    </div>
+
+    <div class="form-actions">
+      <button 
+        type="button" 
+        class="btn btn-secondary" 
+        (click)="cancel()"
+      >
+        Cancelar
+      </button>
+      <button 
+        type="submit" 
+        class="btn btn-primary" 
+        [disabled]="loading"
+      >
+        <span *ngIf="loading" class="spinner-border spinner-border-sm mr-1"></span>
+        Crear usuario
+      </button>
+    </div>
+  </form>
+</div>
