@@ -7,16 +7,11 @@ import { User } from '../models/user.model';
   providedIn: 'root'
 })
 export class UserService {
-  updateUser(userId: number, userData: any): Observable<any>  {
-      throw new Error('Method not implemented.');
-  }
-  deleteUser(userId: number): Observable<any> {
-    throw new Error('Method not implemented.');
-  }
   private apiUrl = 'http://localhost:3000/api/users'; // Ajusta según tu backend
 
   constructor(private http: HttpClient) { }
 
+  // Obtener usuarios paginados
   getUsers(page: number = 1, limit: number = 5): Observable<any> {
     const params = new HttpParams()
       .set('page', page.toString())
@@ -25,9 +20,23 @@ export class UserService {
     return this.http.get<any>(this.apiUrl, { params });
   }
 
+  // Obtener un usuario por ID
   getUserById(id: number): Observable<User> {
     return this.http.get<User>(`${this.apiUrl}/${id}`);
   }
   
-  // Otros métodos que necesites
+  // Crear un nuevo usuario
+  createUser(userData: any): Observable<any> {
+    return this.http.post(this.apiUrl, userData);
+  }
+
+  // Actualizar un usuario existente
+  updateUser(userId: number, userData: any): Observable<any> {
+    return this.http.put(`${this.apiUrl}/${userId}`, userData);
+  }
+
+  // Eliminar un usuario
+  deleteUser(userId: number): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/${userId}`);
+  }
 }
