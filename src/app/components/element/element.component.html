@@ -1,0 +1,11 @@
+<div class="item-card">
+    <h3>{{ _todo.title }}</h3>
+    <p><strong>ID:</strong> {{ _todo.id }}</p>
+    <p><strong>Usuario:</strong> {{ _todo.userId ? _todo.userId : 'No asignado' }}</p>
+    <p><strong>Estado:</strong> 
+      <span [class.completed]="_todo.completed" [class.pending]="!_todo.completed">
+        {{ _todo.completed ? '✔ Completado' : '⏳ Pendiente' }}
+      </span>
+    </p>
+  </div>
+  

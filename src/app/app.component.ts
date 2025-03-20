@@ -1,21 +1,16 @@
 import { Component } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { RouterOutlet } from '@angular/router';
-import { UsuarioComponent } from "./usuario/usuario.component";
-import { LoginComponent } from "./login/login.component";
-import { RegisterComponent } from "./register/register.component";
+
+import { NavigateComponent } from './components/navigate/navigate.component';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, UsuarioComponent, LoginComponent, RegisterComponent],
+  standalone: true,
+  imports: [CommonModule, RouterOutlet, NavigateComponent],
   templateUrl: './app.component.html',
-  styleUrl: './app.component.css',
-  standalone: true
-  
+  styleUrls: ['./app.component.css']
 })
 export class AppComponent {
-  title = 'angular-seminari6';
-  loggedin: boolean = false;
-  getLoggedIn(loggedin: boolean){
-    this.loggedin = loggedin;
-  }
+  title = 'ea-exercise-angular';
 }

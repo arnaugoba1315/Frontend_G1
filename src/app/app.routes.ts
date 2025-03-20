@@ -1,12 +1,29 @@
 import { Routes } from '@angular/router';
-import { HomeComponent } from './frontend/home/home.component';
-import { DashboardComponent } from './admin/dashboard/dashboard.component';
-import { LoginComponent } from './login/login.component';
+
+import { CollectionComponent } from './components/colletion/colletion.component'; 
+import { ElementComponent } from './components/element/element.component';
+import { CreateElementComponent } from './components/create-element/create-element.component';
 
 export const routes: Routes = [
-  { path: 'login', component: LoginComponent },
-  { path: '', component: HomeComponent },  // Página principal
-  { path: 'admin', component: DashboardComponent },  // Backoffice
-  { path: '**', redirectTo: '' }  // Redirigir a Home si la ruta no existe
+  {
+    path: 'elements',
+    component: CollectionComponent
+  },
+  {
+    path: 'elements/new',
+    component: CreateElementComponent
+  },
+  {
+    path: 'elements/new/:id',
+    component: CreateElementComponent
+  },
+  {
+    path: 'elements/:id',
+    component: ElementComponent
+  },
+  {
+    path: '',
+    redirectTo: '/elements',
+    pathMatch: 'full'
+  }
 ];
-

@@ -1,0 +1,27 @@
+<div class="item-card">
+    <h3>New Element</h3>
+    <form [formGroup]="_form" (ngSubmit)="onSubmit()" class="todo-form">
+        <label>
+          User ID:
+          <input type="text" formControlName="userId" required>
+        </label>
+      
+        <label>
+          Todo ID:
+          <input type="text" formControlName="id" required>
+        </label>
+      
+        <label>
+          Title:
+          <input type="text" formControlName="title" required>
+        </label>
+      
+        <label>
+          Completed:
+          <input type="checkbox" formControlName="completed">
+        </label>
+        <button type="submit" [disabled]="_form.invalid">
+            {{ _todoId ? 'Actualizar Todo' : 'Crear Todo' }}
+          </button>      
+    </form>
+</div>
