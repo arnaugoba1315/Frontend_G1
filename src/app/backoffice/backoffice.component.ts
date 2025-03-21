@@ -17,7 +17,7 @@ import { User } from '../models/user.model';
 export class BackOfficeComponent implements OnInit {
   users: User[] = [];
   currentPage = 1;
-  itemsPerPage = 5; // Limitamos a 5 usuarios por página
+  itemsPerPage = 5;
   totalPages = 0;
   totalUsers = 0;
   pages: number[] = [];
@@ -25,6 +25,9 @@ export class BackOfficeComponent implements OnInit {
   error = '';
   usuariosListados = false;
   showCreateModal = false;
+  showEditModal = false; // Propiedad para mostrar/ocultar el modal de edición
+  showViewModal = false; // Propiedad para mostrar/ocultar el modal de visualización
+  selectedUser: User | null = null; // Usuario seleccionado para editar o ver
   
   // Datos de ejemplo completos (para simulación)
   allMockUsers: User[] = [
@@ -113,11 +116,17 @@ export class BackOfficeComponent implements OnInit {
 
   showCreateUserForm(): void {
     this.showCreateModal = true;
+    this.showEditModal = false;
+    this.showViewModal = false;
+    this.selectedUser = null;
   }
 
   editarUsuario(user: User): void {
     console.log('Editar usuario:', user);
-    // Aquí implementarías la lógica para editar un usuario
+    this.selectedUser = { ...user }; // Crear una copia para no modificar el original directamente
+    this.showEditModal = true;
+    this.showCreateModal = false;
+    this.showViewModal = false;
   }
 
   marcarUsuarioInvisible(user: User): void {
@@ -128,9 +137,9 @@ export class BackOfficeComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        // Lógica para ocultar usuario
+        // Aquí implementarías la lógica para ocultar un usuario
         console.log(`Usuario ${user._id} ocultado`);
-        this.obtenerUsuarios();
+        this.obtenerUsuarios(); // Recargar la lista después de ocultar
       }
     });
   }
@@ -153,7 +162,7 @@ export class BackOfficeComponent implements OnInit {
               this.allMockUsers.splice(index, 1);
             }
             
-            this.obtenerUsuarios();
+            this.obtenerUsuarios(); // Recargar la lista después de eliminar
           },
           error: (error) => {
             console.error('Error al eliminar usuario:', error);
@@ -165,14 +174,40 @@ export class BackOfficeComponent implements OnInit {
 
   verDetallesUsuario(user: User): void {
     console.log('Ver detalles de usuario:', user);
-    // Lógica para mostrar detalles
+    this.selectedUser = { ...user }; // Crear una copia para no modificar el original
+    this.showViewModal = true;
+    this.showEditModal = false;
+    this.showCreateModal = false;
   }
 
   onUserCreated(success: boolean): void {
     this.showCreateModal = false;
     if (success) {
-      this.obtenerUsuarios();
+      this.obtenerUsuarios(); // Recargar la lista después de crear un nuevo usuario
     }
+  }
+
+  onUserEdited(success: boolean): void {
+    if (success && this.selectedUser) {
+      // Actualizar el usuario en el backend
+      this.userService.updateUser(this.selectedUser._id, this.selectedUser).subscribe({
+        next: () => {
+          console.log(`Usuario ${this.selectedUser?._id} actualizado correctamente`);
+          this.showEditModal = false;
+          this.obtenerUsuarios(); // Recargar la lista
+        },
+        error: (error) => {
+          console.error('Error al actualizar usuario:', error);
+        }
+      });
+    } else {
+      this.showEditModal = false;
+    }
+  }
+
+  closeViewModal(): void {
+    this.showViewModal = false;
+    this.selectedUser = null;
   }
 
   trackByUserId(index: number, user: User): string {
