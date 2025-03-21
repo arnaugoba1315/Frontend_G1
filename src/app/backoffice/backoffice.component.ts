@@ -31,18 +31,18 @@ export class BackOfficeComponent implements OnInit {
   
   // Datos de ejemplo completos (para simulación)
   allMockUsers: User[] = [
-    { _id: '1', username: 'Usuario1', email: 'usuario1@example.com', level: 1, bio: 'Bio de usuario 1', profilePicture: '' },
-    { _id: '2', username: 'Usuario2', email: 'usuario2@example.com', level: 2, bio: 'Bio de usuario 2', profilePicture: '' },
-    { _id: '3', username: 'Usuario3', email: 'usuario3@example.com', level: 3, bio: 'Bio de usuario 3', profilePicture: '' },
-    { _id: '4', username: 'Usuario4', email: 'usuario4@example.com', level: 1, bio: 'Bio de usuario 4', profilePicture: '' },
-    { _id: '5', username: 'Usuario5', email: 'usuario5@example.com', level: 2, bio: 'Bio de usuario 5', profilePicture: '' },
-    { _id: '6', username: 'Usuario6', email: 'usuario6@example.com', level: 3, bio: 'Bio de usuario 6', profilePicture: '' },
-    { _id: '7', username: 'Usuario7', email: 'usuario7@example.com', level: 1, bio: 'Bio de usuario 7', profilePicture: '' },
-    { _id: '8', username: 'Usuario8', email: 'usuario8@example.com', level: 2, bio: 'Bio de usuario 8', profilePicture: '' },
-    { _id: '9', username: 'Usuario9', email: 'usuario9@example.com', level: 3, bio: 'Bio de usuario 9', profilePicture: '' },
-    { _id: '10', username: 'Usuario10', email: 'usuario10@example.com', level: 1, bio: 'Bio de usuario 10', profilePicture: '' },
-    { _id: '11', username: 'Usuario11', email: 'usuario11@example.com', level: 2, bio: 'Bio de usuario 11', profilePicture: '' },
-    { _id: '12', username: 'Usuario12', email: 'usuario12@example.com', level: 3, bio: 'Bio de usuario 12', profilePicture: '' }
+    { _id: '1', username: 'Usuario1', email: 'usuario1@example.com', level: 1, bio: 'Bio de usuario 1', profilePicture: '', visible: true },
+    { _id: '2', username: 'Usuario2', email: 'usuario2@example.com', level: 2, bio: 'Bio de usuario 2', profilePicture: '', visible: true },
+    { _id: '3', username: 'Usuario3', email: 'usuario3@example.com', level: 3, bio: 'Bio de usuario 3', profilePicture: '', visible: true },
+    { _id: '4', username: 'Usuario4', email: 'usuario4@example.com', level: 1, bio: 'Bio de usuario 4', profilePicture: '', visible: true },
+    { _id: '5', username: 'Usuario5', email: 'usuario5@example.com', level: 2, bio: 'Bio de usuario 5', profilePicture: '', visible: true },
+    { _id: '6', username: 'Usuario6', email: 'usuario6@example.com', level: 3, bio: 'Bio de usuario 6', profilePicture: '', visible: true },
+    { _id: '7', username: 'Usuario7', email: 'usuario7@example.com', level: 1, bio: 'Bio de usuario 7', profilePicture: '', visible: true },
+    { _id: '8', username: 'Usuario8', email: 'usuario8@example.com', level: 2, bio: 'Bio de usuario 8', profilePicture: '', visible: true },
+    { _id: '9', username: 'Usuario9', email: 'usuario9@example.com', level: 3, bio: 'Bio de usuario 9', profilePicture: '', visible: true },
+    { _id: '10', username: 'Usuario10', email: 'usuario10@example.com', level: 1, bio: 'Bio de usuario 10', profilePicture: '', visible: true },
+    { _id: '11', username: 'Usuario11', email: 'usuario11@example.com', level: 2, bio: 'Bio de usuario 11', profilePicture: '', visible: true },
+    { _id: '12', username: 'Usuario12', email: 'usuario12@example.com', level: 3, bio: 'Bio de usuario 12', profilePicture: '', visible: true }
   ];
   
   constructor(
@@ -62,7 +62,10 @@ export class BackOfficeComponent implements OnInit {
       .subscribe({
         next: (response) => {
           if (response.users && response.users.length > 0) {
-            this.users = response.users;
+            this.users = response.users.map((user: User) => ({
+              ...user,
+              visible: user.visible !== undefined ? user.visible : true // Inicializar visible a true si no está definido
+            }));
             this.totalUsers = response.totalUsers;
             this.totalPages = response.totalPages;
           } else {
@@ -92,7 +95,10 @@ export class BackOfficeComponent implements OnInit {
     const endIndex = Math.min(startIndex + this.itemsPerPage, this.allMockUsers.length);
     
     // Obtener los usuarios de la página actual
-    this.users = this.allMockUsers.slice(startIndex, endIndex);
+    this.users = this.allMockUsers.slice(startIndex, endIndex).map(user => ({
+      ...user,
+      visible: user.visible !== undefined ? user.visible : true // Inicializar visible a true si no está definido
+    }));
     
     // Calcular el total de usuarios y páginas
     this.totalUsers = this.allMockUsers.length;
@@ -130,16 +136,16 @@ export class BackOfficeComponent implements OnInit {
   }
 
   marcarUsuarioInvisible(user: User): void {
-    console.log('Ocultar usuario:', user);
     const dialogRef = this.dialog.open(ConfirmDialogComponent, {
-      data: { message: `¿Estás seguro de que deseas ocultar el usuario ${user.username}?` }
+      data: { message: `¿Estás seguro de que deseas ${user.visible ? 'ocultar' : 'mostrar'} el usuario ${user.username}?` }
     });
-
+  
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        // Aquí implementarías la lógica para ocultar un usuario
-        console.log(`Usuario ${user._id} ocultado`);
-        this.obtenerUsuarios(); // Recargar la lista después de ocultar
+        user.visible = !user.visible;
+        console.log(`Usuario ${user._id} ${user.visible ? 'visible' : 'ocultado'}`);
+        // Aquí podrías llamar a un servicio para actualizar el estado del usuario en el backend si es necesario
+        // this.userService.updateUserVisibility(user._id, user.visible).subscribe();
       }
     });
   }

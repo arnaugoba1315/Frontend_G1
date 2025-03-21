@@ -1,5 +1,4 @@
 <div class="container">
-   
   <!-- Botón para crear usuario -->
   <div class="action-buttons">
     <button class="btn-create" (click)="showCreateUserForm()">
@@ -19,7 +18,9 @@
     <!-- Tabla de usuarios -->
     <div class="users-grid">
       <div *ngFor="let user of users; trackBy: trackByUserId" 
-           class="user-card">
+           class="user-card"
+           [class.hidden]="!user.visible"> <!-- Añadir esta clase -->
+
         <div class="user-header">
           <img [src]="user.profilePicture || 'assets/default-profile.jpg'" 
                alt="Foto de perfil" 
@@ -36,7 +37,8 @@
             <i class="material-icons">edit</i> Editar
           </button>
           <button class="btn-hide" (click)="marcarUsuarioInvisible(user)">
-            <i class="material-icons">visibility_off</i> Ocultar
+            <i class="material-icons">{{ user.visible ? 'visibility_off' : 'visibility' }}</i> 
+            {{ user.visible ? 'Ocultar' : 'Mostrar' }}
           </button>
           <button class="btn-delete" (click)="eliminarUsuario(user)">
             <i class="material-icons">delete</i> Eliminar
