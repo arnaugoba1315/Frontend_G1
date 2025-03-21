@@ -1,193 +1,222 @@
-import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
-import { User } from '../models/user.model';
+import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { UserService } from '../services/user.service';
-import { Router } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
-import { ConfirmDialogComponent } from '../confirmDialog/confirm-dialog.component';
+import { ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog.component';
 import { UserCreateComponent } from '../components/user-create/user-create.component';
+import { User } from '../models/user.model';
 
 @Component({
   selector: 'app-backoffice',
-  imports: [CommonModule, FormsModule, UserCreateComponent],
   templateUrl: './backoffice.component.html',
-  styleUrl: './backoffice.component.css',
-  standalone: true
+  styleUrls: ['./backoffice.component.css'],
+  standalone: true,
+  imports: [CommonModule, FormsModule, UserCreateComponent]
 })
 export class BackOfficeComponent implements OnInit {
-  // Variable para controlar la visualización de usuarios
-  usuariosListados = false;
-  
-  // Variables para la lista de usuarios
   users: User[] = [];
-  
-  // Variables para paginación
   currentPage = 1;
-  itemsPerPage = 5; // Limite de 5 usuarios por página
-  totalUsers = 0;
+  itemsPerPage = 5;
   totalPages = 0;
+  totalUsers = 0;
   pages: number[] = [];
-
-  // Variable para controlar el formulario de creación
+  loading = false;
+  error = '';
+  usuariosListados = false;
   showCreateModal = false;
+  showEditModal = false; // Propiedad para mostrar/ocultar el modal de edición
+  showViewModal = false; // Propiedad para mostrar/ocultar el modal de visualización
+  selectedUser: User | null = null; // Usuario seleccionado para editar o ver
+  
+  // Datos de ejemplo completos (para simulación)
+  allMockUsers: User[] = [
+    { _id: '1', username: 'Usuario1', email: 'usuario1@example.com', level: 1, bio: 'Bio de usuario 1', profilePicture: '', visible: true },
+    { _id: '2', username: 'Usuario2', email: 'usuario2@example.com', level: 2, bio: 'Bio de usuario 2', profilePicture: '', visible: true },
+    { _id: '3', username: 'Usuario3', email: 'usuario3@example.com', level: 3, bio: 'Bio de usuario 3', profilePicture: '', visible: true },
+    { _id: '4', username: 'Usuario4', email: 'usuario4@example.com', level: 1, bio: 'Bio de usuario 4', profilePicture: '', visible: true },
+    { _id: '5', username: 'Usuario5', email: 'usuario5@example.com', level: 2, bio: 'Bio de usuario 5', profilePicture: '', visible: true },
+    { _id: '6', username: 'Usuario6', email: 'usuario6@example.com', level: 3, bio: 'Bio de usuario 6', profilePicture: '', visible: true },
+    { _id: '7', username: 'Usuario7', email: 'usuario7@example.com', level: 1, bio: 'Bio de usuario 7', profilePicture: '', visible: true },
+    { _id: '8', username: 'Usuario8', email: 'usuario8@example.com', level: 2, bio: 'Bio de usuario 8', profilePicture: '', visible: true },
+    { _id: '9', username: 'Usuario9', email: 'usuario9@example.com', level: 3, bio: 'Bio de usuario 9', profilePicture: '', visible: true },
+    { _id: '10', username: 'Usuario10', email: 'usuario10@example.com', level: 1, bio: 'Bio de usuario 10', profilePicture: '', visible: true },
+    { _id: '11', username: 'Usuario11', email: 'usuario11@example.com', level: 2, bio: 'Bio de usuario 11', profilePicture: '', visible: true },
+    { _id: '12', username: 'Usuario12', email: 'usuario12@example.com', level: 3, bio: 'Bio de usuario 12', profilePicture: '', visible: true }
+  ];
   
   constructor(
     private userService: UserService,
-    private router: Router,
     private dialog: MatDialog
   ) {}
-  
+
   ngOnInit(): void {
-    // No cargar usuarios al inicio
+    // No cargamos usuarios automáticamente, esperamos a que el usuario haga clic en el botón
   }
-  
-  // Método para obtener usuarios paginados cuando se hace clic en el botón
-  obtenerUsuarios() {
-    this.userService.getUsers(this.currentPage, this.itemsPerPage).subscribe({
-      next: (data) => {
-        this.users = data.users;
-        this.totalUsers = data.totalUsers;
-        this.totalPages = data.totalPages;
-        this.generatePageNumbers();
-        this.usuariosListados = true; // Mostrar la lista de usuarios
-      },
-      error: (error) => {
-        console.error('Error al obtener usuarios:', error);
-        alert('Error al cargar los usuarios. Por favor, inténtalo de nuevo.');
-      }
-    });
+
+  obtenerUsuarios(): void {
+    this.loading = true;
+    
+    // En un entorno real, llamarías al servicio con los parámetros de paginación:
+    this.userService.getUsers(this.currentPage, this.itemsPerPage)
+      .subscribe({
+        next: (response) => {
+          if (response.users && response.users.length > 0) {
+            this.users = response.users.map((user: User) => ({
+              ...user,
+              visible: user.visible !== undefined ? user.visible : true // Inicializar visible a true si no está definido
+            }));
+            this.totalUsers = response.totalUsers;
+            this.totalPages = response.totalPages;
+          } else {
+            // Simulación de paginación con datos de prueba
+            this.simularPaginacion();
+          }
+          this.generatePageNumbers();
+          this.loading = false;
+          this.usuariosListados = true;
+        },
+        error: (err) => {
+          console.error('Error al cargar usuarios:', err);
+          this.error = 'Error al cargar usuarios';
+          this.loading = false;
+          
+          // En caso de error, simulamos paginación con datos de prueba
+          this.simularPaginacion();
+          this.generatePageNumbers();
+          this.usuariosListados = true;
+        }
+      });
   }
-  
-  // Generar números de página para la paginación
-  generatePageNumbers() {
+
+  // Método para simular la paginación con datos de prueba
+  simularPaginacion(): void {
+    const startIndex = (this.currentPage - 1) * this.itemsPerPage;
+    const endIndex = Math.min(startIndex + this.itemsPerPage, this.allMockUsers.length);
+    
+    // Obtener los usuarios de la página actual
+    this.users = this.allMockUsers.slice(startIndex, endIndex).map(user => ({
+      ...user,
+      visible: user.visible !== undefined ? user.visible : true // Inicializar visible a true si no está definido
+    }));
+    
+    // Calcular el total de usuarios y páginas
+    this.totalUsers = this.allMockUsers.length;
+    this.totalPages = Math.ceil(this.totalUsers / this.itemsPerPage);
+  }
+
+  generatePageNumbers(): void {
     this.pages = [];
     for (let i = 1; i <= this.totalPages; i++) {
       this.pages.push(i);
     }
   }
-  
-  // Cambiar de página
-  changePage(page: number) {
+
+  changePage(page: number): void {
     if (page < 1 || page > this.totalPages) {
       return;
     }
     this.currentPage = page;
     this.obtenerUsuarios();
   }
-  
-  // Para trackBy en ngFor
-  trackByUserId(index: number, user: User): number {
-    return user.id;
-  }
-  
-  // Ver detalles del usuario al hacer clic
-  verDetallesUsuario(user: User) {
-    // Mostrar los detalles del usuario en una alerta o modal temporal
-    // hasta que implementes una vista de detalles completa
-    const detalles = `
-      Usuario: ${user.username}
-      Email: ${user.email}
-      Nivel: ${user.level}
-      Bio: ${user.bio || 'No disponible'}
-    `;
-    
-    alert(detalles);
-    
-    // Si tienes una ruta específica para ver detalles, descomenta esta línea:
-    // this.router.navigate(['/users', user.id]);
-  }
 
-  // Editar usuario
-  editarUsuario(user: User) {
-    try {
-      // Comprobamos si la ruta existe
-      this.router.navigate(['/users/edit', user.id]);
-    } catch (error) {
-      console.error('Error al navegar a la página de edición:', error);
-      alert('La funcionalidad de edición de usuarios está en desarrollo.');
-    }
-  }
-
-  // Marcar usuario como invisible (soft delete mediante actualización directa)
-  marcarUsuarioInvisible(user: User) {
-    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
-      width: '300px',
-      data: { 
-        title: 'Confirmar acción', 
-        message: '¿Estás seguro de que deseas ocultar este usuario?' 
-      }
-    });
-    
-    dialogRef.afterClosed().subscribe(result => {
-      if (result) {
-        // Actualizar el usuario para marcarlo como invisible
-        const userData = {
-          visible: false
-        };
-        
-        this.userService.updateUser(user.id, userData).subscribe({
-          next: () => {
-            console.log('Usuario ocultado con éxito');
-            // Actualizar la lista de usuarios
-            this.obtenerUsuarios();
-            // Mostrar mensaje de éxito
-            alert('Usuario ocultado con éxito');
-          },
-          error: (error) => {
-            console.error('Error al ocultar el usuario:', error);
-            alert('Error al ocultar el usuario. Por favor, inténtalo de nuevo.');
-          }
-        });
-      }
-    });
-  }
-
-  // Eliminar usuario (soft delete mediante API deleteUser)
-  eliminarUsuario(user: User) {
-    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
-      width: '300px',
-      data: { 
-        title: 'Confirmar eliminación', 
-        message: '¿Estás seguro de que deseas eliminar este usuario? Esta acción lo ocultará del sistema.' 
-      }
-    });
-    
-    dialogRef.afterClosed().subscribe(result => {
-      if (result) {
-        this.userService.deleteUser(user.id).subscribe({
-          next: (response) => {
-            console.log('Usuario eliminado con éxito:', response);
-            // Actualizar la lista de usuarios
-            this.obtenerUsuarios();
-            // Mostrar mensaje de éxito
-            alert('Usuario eliminado con éxito');
-          },
-          error: (error) => {
-            console.error('Error al eliminar el usuario:', error);
-            alert('Error al eliminar el usuario. Por favor, inténtalo de nuevo.');
-          }
-        });
-      }
-    });
-  }
-
-  // Mostrar formulario de creación de usuario
-  showCreateUserForm() {
+  showCreateUserForm(): void {
     this.showCreateModal = true;
+    this.showEditModal = false;
+    this.showViewModal = false;
+    this.selectedUser = null;
   }
 
-  // Manejar la creación exitosa de un usuario
-  onUserCreated(success: boolean) {
-    if (success) {
-      this.showCreateModal = false;
-      // Recargar la lista de usuarios si ya estaba visible
-      if (this.usuariosListados) {
-        this.obtenerUsuarios();
+  editarUsuario(user: User): void {
+    console.log('Editar usuario:', user);
+    this.selectedUser = { ...user }; // Crear una copia para no modificar el original directamente
+    this.showEditModal = true;
+    this.showCreateModal = false;
+    this.showViewModal = false;
+  }
+
+  marcarUsuarioInvisible(user: User): void {
+    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+      data: { message: `¿Estás seguro de que deseas ${user.visible ? 'ocultar' : 'mostrar'} el usuario ${user.username}?` }
+    });
+  
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        user.visible = !user.visible;
+        console.log(`Usuario ${user._id} ${user.visible ? 'visible' : 'ocultado'}`);
+        // Aquí podrías llamar a un servicio para actualizar el estado del usuario en el backend si es necesario
+        // this.userService.updateUserVisibility(user._id, user.visible).subscribe();
       }
-    } else {
-      // Si el usuario canceló, solo cerrar el formulario
-      this.showCreateModal = false;
+    });
+  }
+
+  eliminarUsuario(user: User): void {
+    console.log('Eliminar usuario:', user);
+    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+      data: { message: `¿Estás seguro de que deseas eliminar el usuario ${user.username}?` }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.userService.deleteUser(user._id).subscribe({
+          next: () => {
+            console.log(`Usuario ${user._id} eliminado`);
+            
+            // Eliminar el usuario de nuestros datos de prueba también
+            const index = this.allMockUsers.findIndex(u => u._id === user._id);
+            if (index !== -1) {
+              this.allMockUsers.splice(index, 1);
+            }
+            
+            this.obtenerUsuarios(); // Recargar la lista después de eliminar
+          },
+          error: (error) => {
+            console.error('Error al eliminar usuario:', error);
+          }
+        });
+      }
+    });
+  }
+
+  verDetallesUsuario(user: User): void {
+    console.log('Ver detalles de usuario:', user);
+    this.selectedUser = { ...user }; // Crear una copia para no modificar el original
+    this.showViewModal = true;
+    this.showEditModal = false;
+    this.showCreateModal = false;
+  }
+
+  onUserCreated(success: boolean): void {
+    this.showCreateModal = false;
+    if (success) {
+      this.obtenerUsuarios(); // Recargar la lista después de crear un nuevo usuario
     }
+  }
+
+  onUserEdited(success: boolean): void {
+    if (success && this.selectedUser) {
+      // Actualizar el usuario en el backend
+      this.userService.updateUser(this.selectedUser._id, this.selectedUser).subscribe({
+        next: () => {
+          console.log(`Usuario ${this.selectedUser?._id} actualizado correctamente`);
+          this.showEditModal = false;
+          this.obtenerUsuarios(); // Recargar la lista
+        },
+        error: (error) => {
+          console.error('Error al actualizar usuario:', error);
+        }
+      });
+    } else {
+      this.showEditModal = false;
+    }
+  }
+
+  closeViewModal(): void {
+    this.showViewModal = false;
+    this.selectedUser = null;
+  }
+
+  trackByUserId(index: number, user: User): string {
+    return user._id;
   }
 }

@@ -5,7 +5,7 @@
             <label for="username" class="form-label">Nom d'usuari:  </label>
             <input [ngClass]="{'is-invalid': hasError('username','required') || hasError('username','email')}"
             type="username" class="form-control" id="username" formControlName="username">
-            <div class="text-danger" *ngIf="hasError('username','required')">Correu electrònic obligatori.</div>
+            <div class="text-danger" *ngIf="hasError('username','required')">Nom d'usuari obligatori.</div>
         </div>
         <div class="mb-3">
             <label for="password" class="form-label">Contrasenya:  </label>

@@ -21,7 +21,7 @@ export class UserService {
   }
 
   // Obtener un usuario por ID
-  getUserById(id: number): Observable<User> {
+  getUserById(id: string): Observable<User> {
     return this.http.get<User>(`${this.apiUrl}/${id}`);
   }
   
@@ -31,12 +31,12 @@ export class UserService {
   }
 
   // Actualizar un usuario existente
-  updateUser(userId: number, userData: any): Observable<any> {
+  updateUser(userId: string, userData: any): Observable<any> {
     return this.http.put(`${this.apiUrl}/${userId}`, userData);
   }
 
   // Eliminar un usuario
-  deleteUser(userId: number): Observable<any> {
+  deleteUser(userId: string): Observable<any> {
     return this.http.delete(`${this.apiUrl}/${userId}`);
   }
 }

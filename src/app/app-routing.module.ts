@@ -9,7 +9,8 @@ const routes: Routes = [
   { path: 'users', component: UserListComponent },
   { path: 'users/edit/:id', component: UserEditComponent },
   { path: 'admin', component: BackOfficeComponent },
-  { path: '', redirectTo: '/users', pathMatch: 'full' }
+  { path: '', redirectTo: '/users', pathMatch: 'full' },
+  //{ path:'**', component: PageNotFoundComponent}
 ];
 
 @NgModule({

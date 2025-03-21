@@ -1,5 +1,5 @@
 export interface User {
-  id: number;
+  _id: string; // Cambiado de number a string para alinearse con MongoDB ObjectId
   username: string;
   bio: string;
   profilePicture: string;
@@ -10,7 +10,7 @@ export interface User {
 
 export class User implements User {
   constructor(
-    public id: number,
+    public _id: string, // Cambiado de number a string
     public username: string,
     public bio: string,
     public profilePicture: string,
