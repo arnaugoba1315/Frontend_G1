@@ -17,14 +17,30 @@ import { User } from '../models/user.model';
 export class BackOfficeComponent implements OnInit {
   users: User[] = [];
   currentPage = 1;
-  itemsPerPage = 10;
+  itemsPerPage = 5; // Limitamos a 5 usuarios por página
   totalPages = 0;
-  totalUsers = 0; // Corregido: totalUsers en lugar de totalItems
-  pages: number[] = []; // Corregido: pages como propiedad del componente
+  totalUsers = 0;
+  pages: number[] = [];
   loading = false;
   error = '';
-  usuariosListados = false; // Corregido: usuariosListados como propiedad
-  showCreateModal = false; // Corregido: showCreateModal como propiedad
+  usuariosListados = false;
+  showCreateModal = false;
+  
+  // Datos de ejemplo completos (para simulación)
+  allMockUsers: User[] = [
+    { _id: '1', username: 'Usuario1', email: 'usuario1@example.com', level: 1, bio: 'Bio de usuario 1', profilePicture: '' },
+    { _id: '2', username: 'Usuario2', email: 'usuario2@example.com', level: 2, bio: 'Bio de usuario 2', profilePicture: '' },
+    { _id: '3', username: 'Usuario3', email: 'usuario3@example.com', level: 3, bio: 'Bio de usuario 3', profilePicture: '' },
+    { _id: '4', username: 'Usuario4', email: 'usuario4@example.com', level: 1, bio: 'Bio de usuario 4', profilePicture: '' },
+    { _id: '5', username: 'Usuario5', email: 'usuario5@example.com', level: 2, bio: 'Bio de usuario 5', profilePicture: '' },
+    { _id: '6', username: 'Usuario6', email: 'usuario6@example.com', level: 3, bio: 'Bio de usuario 6', profilePicture: '' },
+    { _id: '7', username: 'Usuario7', email: 'usuario7@example.com', level: 1, bio: 'Bio de usuario 7', profilePicture: '' },
+    { _id: '8', username: 'Usuario8', email: 'usuario8@example.com', level: 2, bio: 'Bio de usuario 8', profilePicture: '' },
+    { _id: '9', username: 'Usuario9', email: 'usuario9@example.com', level: 3, bio: 'Bio de usuario 9', profilePicture: '' },
+    { _id: '10', username: 'Usuario10', email: 'usuario10@example.com', level: 1, bio: 'Bio de usuario 10', profilePicture: '' },
+    { _id: '11', username: 'Usuario11', email: 'usuario11@example.com', level: 2, bio: 'Bio de usuario 11', profilePicture: '' },
+    { _id: '12', username: 'Usuario12', email: 'usuario12@example.com', level: 3, bio: 'Bio de usuario 12', profilePicture: '' }
+  ];
   
   constructor(
     private userService: UserService,
@@ -35,28 +51,20 @@ export class BackOfficeComponent implements OnInit {
     // No cargamos usuarios automáticamente, esperamos a que el usuario haga clic en el botón
   }
 
-  // Corregido: obtenerUsuarios en lugar de loadUsers
   obtenerUsuarios(): void {
     this.loading = true;
+    
+    // En un entorno real, llamarías al servicio con los parámetros de paginación:
     this.userService.getUsers(this.currentPage, this.itemsPerPage)
       .subscribe({
         next: (response) => {
-          // Si no hay datos en el backend, usamos datos de prueba
           if (response.users && response.users.length > 0) {
             this.users = response.users;
             this.totalUsers = response.totalUsers;
             this.totalPages = response.totalPages;
           } else {
-            // Datos de prueba
-            this.users = [
-              { _id: '1', username: 'Usuario1', email: 'usuario1@example.com', level: 1, bio: 'Bio de usuario 1', profilePicture: '' },
-              { _id: '2', username: 'Usuario2', email: 'usuario2@example.com', level: 2, bio: 'Bio de usuario 2', profilePicture: '' },
-              { _id: '3', username: 'Usuario3', email: 'usuario3@example.com', level: 3, bio: 'Bio de usuario 3', profilePicture: '' },
-              { _id: '4', username: 'UsuarioA', email: 'usuarioA@example.com', level: 1, bio: 'Bio de usuario A', profilePicture: '' },
-              { _id: '5', username: 'UsuarioB', email: 'usuarioB@example.com', level: 2, bio: 'Bio de usuario B', profilePicture: '' }
-            ];
-            this.totalUsers = this.users.length;
-            this.totalPages = Math.ceil(this.totalUsers / this.itemsPerPage);
+            // Simulación de paginación con datos de prueba
+            this.simularPaginacion();
           }
           this.generatePageNumbers();
           this.loading = false;
@@ -67,20 +75,25 @@ export class BackOfficeComponent implements OnInit {
           this.error = 'Error al cargar usuarios';
           this.loading = false;
           
-          // En caso de error, mostramos datos de prueba
-          this.users = [
-            { _id: '1', username: 'Usuario1', email: 'usuario1@example.com', level: 1, bio: 'Bio de usuario 1', profilePicture: '' },
-            { _id: '2', username: 'Usuario2', email: 'usuario2@example.com', level: 2, bio: 'Bio de usuario 2', profilePicture: '' },
-            { _id: '3', username: 'Usuario3', email: 'usuario3@example.com', level: 3, bio: 'Bio de usuario 3', profilePicture: '' },
-            { _id: '4', username: 'UsuarioA', email: 'usuarioA@example.com', level: 1, bio: 'Bio de usuario A', profilePicture: '' },
-            { _id: '5', username: 'UsuarioB', email: 'usuarioB@example.com', level: 2, bio: 'Bio de usuario B', profilePicture: '' }
-          ];
-          this.totalUsers = this.users.length;
-          this.totalPages = Math.ceil(this.totalUsers / this.itemsPerPage);
+          // En caso de error, simulamos paginación con datos de prueba
+          this.simularPaginacion();
           this.generatePageNumbers();
           this.usuariosListados = true;
         }
       });
+  }
+
+  // Método para simular la paginación con datos de prueba
+  simularPaginacion(): void {
+    const startIndex = (this.currentPage - 1) * this.itemsPerPage;
+    const endIndex = Math.min(startIndex + this.itemsPerPage, this.allMockUsers.length);
+    
+    // Obtener los usuarios de la página actual
+    this.users = this.allMockUsers.slice(startIndex, endIndex);
+    
+    // Calcular el total de usuarios y páginas
+    this.totalUsers = this.allMockUsers.length;
+    this.totalPages = Math.ceil(this.totalUsers / this.itemsPerPage);
   }
 
   generatePageNumbers(): void {
@@ -98,19 +111,15 @@ export class BackOfficeComponent implements OnInit {
     this.obtenerUsuarios();
   }
 
-  // Corregido: showCreateUserForm en lugar de showCreateForm
   showCreateUserForm(): void {
     this.showCreateModal = true;
   }
 
-  // Corregido: editarUsuario en lugar de editUser
   editarUsuario(user: User): void {
     console.log('Editar usuario:', user);
     // Aquí implementarías la lógica para editar un usuario
-    // Por ejemplo, podrías abrir un modal de edición
   }
 
-  // Corregido: marcarUsuarioInvisible en lugar de hideUser
   marcarUsuarioInvisible(user: User): void {
     console.log('Ocultar usuario:', user);
     const dialogRef = this.dialog.open(ConfirmDialogComponent, {
@@ -119,14 +128,13 @@ export class BackOfficeComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        // Aquí implementarías la lógica para ocultar un usuario
+        // Lógica para ocultar usuario
         console.log(`Usuario ${user._id} ocultado`);
-        this.obtenerUsuarios(); // Recargar la lista después de ocultar
+        this.obtenerUsuarios();
       }
     });
   }
 
-  // Corregido: eliminarUsuario en lugar de deleteUser
   eliminarUsuario(user: User): void {
     console.log('Eliminar usuario:', user);
     const dialogRef = this.dialog.open(ConfirmDialogComponent, {
@@ -135,11 +143,17 @@ export class BackOfficeComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        // Corrección: Usar _id como string en lugar de id como número
         this.userService.deleteUser(user._id).subscribe({
           next: () => {
             console.log(`Usuario ${user._id} eliminado`);
-            this.obtenerUsuarios(); // Recargar la lista después de eliminar
+            
+            // Eliminar el usuario de nuestros datos de prueba también
+            const index = this.allMockUsers.findIndex(u => u._id === user._id);
+            if (index !== -1) {
+              this.allMockUsers.splice(index, 1);
+            }
+            
+            this.obtenerUsuarios();
           },
           error: (error) => {
             console.error('Error al eliminar usuario:', error);
@@ -149,22 +163,18 @@ export class BackOfficeComponent implements OnInit {
     });
   }
 
-  // Corregido: verDetallesUsuario en lugar de showUserDetails
   verDetallesUsuario(user: User): void {
     console.log('Ver detalles de usuario:', user);
-    // Aquí implementarías la lógica para mostrar detalles del usuario
-    // Por ejemplo, podrías abrir un modal con los detalles
+    // Lógica para mostrar detalles
   }
 
-  // Corregido: onUserCreated en lugar de handleUserCreated
   onUserCreated(success: boolean): void {
     this.showCreateModal = false;
     if (success) {
-      this.obtenerUsuarios(); // Recargar la lista después de crear un nuevo usuario
+      this.obtenerUsuarios();
     }
   }
 
-  // Track by function para mejorar el rendimiento de ngFor
   trackByUserId(index: number, user: User): string {
     return user._id;
   }
