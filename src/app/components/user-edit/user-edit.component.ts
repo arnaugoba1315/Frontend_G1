@@ -1,5 +1,5 @@
-import { Component, OnInit, OnDestroy, Output, EventEmitter } from '@angular/core';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Component, OnInit, OnDestroy } from '@angular/core';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { UserService } from '../../services/user.service';
 import { Subscription } from 'rxjs';
@@ -9,7 +9,8 @@ import { CommonModule } from '@angular/common';
   selector: 'app-user-edit',
   templateUrl: './user-edit.component.html',
   styleUrls: ['./user-edit.component.css'],
-  imports: [CommonModule,ReactiveFormsModule]
+  standalone: true,
+  imports: [CommonModule, ReactiveFormsModule, FormsModule]
 })
 export class UserEditComponent implements OnInit, OnDestroy {
   userForm: FormGroup;
@@ -17,10 +18,7 @@ export class UserEditComponent implements OnInit, OnDestroy {
   loading = false;
   submitted = false;
   error = '';
-  @Output() userEdit = new EventEmitter<boolean>();
-
   private subscriptions: Subscription = new Subscription();
-  dialogRef: any;
 
   constructor(
     private formBuilder: FormBuilder,
@@ -49,7 +47,7 @@ export class UserEditComponent implements OnInit, OnDestroy {
 
   loadUserData(): void {
     this.loading = true;
-    const loadSubscription = this.userService.getUserById(Number(this.userId))
+    const loadSubscription = this.userService.getUserById(this.userId)
       .subscribe({
         next: (user) => {
           this.loading = false;
@@ -79,7 +77,7 @@ export class UserEditComponent implements OnInit, OnDestroy {
     }
     
     this.loading = true;
-    const updateSubscription = this.userService.updateUser(Number(this.userId), this.userForm.value)
+    const updateSubscription = this.userService.updateUser(this.userId, this.userForm.value)
       .subscribe({
         next: () => {
           this.loading = false;
@@ -93,10 +91,6 @@ export class UserEditComponent implements OnInit, OnDestroy {
       });
     
     this.subscriptions.add(updateSubscription);
-  }
-
-  onCancel() {
-    this.userEdit.emit(false);
   }
 
   get f() { 

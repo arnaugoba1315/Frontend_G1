@@ -2,6 +2,8 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { UserService } from '../../services/user.service';
+import { MatDialog } from '@angular/material/dialog';
+import { ConfirmDialogComponent } from '../../confirm-dialog/confirm-dialog.component';
 
 @Component({
   selector: 'app-user-list',
@@ -18,7 +20,8 @@ export class UserListComponent implements OnInit {
 
   constructor(
     private userService: UserService,
-    private router: Router
+    private router: Router,
+    private dialog: MatDialog
   ) { }
 
   ngOnInit(): void {
@@ -57,5 +60,24 @@ export class UserListComponent implements OnInit {
 
   editUser(userId: string): void {
     this.router.navigate(['/users/edit', userId]);
+  }
+
+  deleteUser(userId: string): void {
+    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+      data: { message: '¿Estás seguro de que deseas eliminar este usuario?' }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.userService.deleteUser(userId).subscribe({
+          next: () => {
+            this.loadUsers();
+          },
+          error: (error) => {
+            console.error('Error deleting user:', error);
+          }
+        });
+      }
+    });
   }
 }

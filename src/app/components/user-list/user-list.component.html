@@ -1,57 +1,58 @@
 <!-- src/app/components/user-list/user-list.component.html -->
 <div class="container">
-    <h2>Lista de Usuarios</h2>
+  <h2>Lista de Usuarios</h2>
+  
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th>Usuario</th>
+        <th>Email</th>
+        <th>Nivel</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let user of users">
+        <td>{{ user.username }}</td>
+        <td>{{ user.email }}</td>
+        <td>{{ user.level }}</td>
+        <td>
+          <button class="btn btn-primary" (click)="editUser(user._id)">Editar</button>
+          <button class="btn btn-danger" (click)="deleteUser(user._id)">Eliminar</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  
+  <!-- Paginación -->
+  <div class="pagination">
+    <button 
+      class="btn btn-sm" 
+      [class.btn-primary]="currentPage > 1"
+      [class.disabled]="currentPage === 1"
+      (click)="changePage(currentPage - 1)">
+      Anterior
+    </button>
     
-    <table class="table table-striped">
-      <thead>
-        <tr>
-          <th>Usuario</th>
-          <th>Email</th>
-          <th>Nivel</th>
-          <th>Acciones</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let user of users">
-          <td>{{ user.username }}</td>
-          <td>{{ user.email }}</td>
-          <td>{{ user.level }}</td>
-          <td>
-            <button class="btn btn-primary" (click)="editUser(user._id)">Editar</button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+    <button 
+      *ngFor="let page of pages" 
+      class="btn btn-sm mx-1" 
+      [class.btn-primary]="page === currentPage"
+      (click)="changePage(page)">
+      {{ page }}
+    </button>
     
-    <!-- Paginación -->
-    <div class="pagination">
-      <button 
-        class="btn btn-sm" 
-        [class.btn-primary]="currentPage > 1"
-        [class.disabled]="currentPage === 1"
-        (click)="changePage(currentPage - 1)">
-        Anterior
-      </button>
-      
-      <button 
-        *ngFor="let page of pages" 
-        class="btn btn-sm mx-1" 
-        [class.btn-primary]="page === currentPage"
-        (click)="changePage(page)">
-        {{ page }}
-      </button>
-      
-      <button 
-        class="btn btn-sm" 
-        [class.btn-primary]="currentPage < totalPages"
-        [class.disabled]="currentPage === totalPages"
-        (click)="changePage(currentPage + 1)">
-        Siguiente
-      </button>
-    </div>
-    
-    <div class="page-info mt-2">
-      Mostrando página {{ currentPage }} de {{ totalPages }} 
-      ({{ totalItems }} usuarios en total)
-    </div>
+    <button 
+      class="btn btn-sm" 
+      [class.btn-primary]="currentPage < totalPages"
+      [class.disabled]="currentPage === totalPages"
+      (click)="changePage(currentPage + 1)">
+      Siguiente
+    </button>
   </div>
+  
+  <div class="page-info mt-2">
+    Mostrando página {{ currentPage }} de {{ totalPages }} 
+    ({{ totalItems }} usuarios en total)
+  </div>
+</div>
