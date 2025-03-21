@@ -19,7 +19,7 @@
     <div class="users-grid">
       <div *ngFor="let user of users; trackBy: trackByUserId" 
            class="user-card"
-           [class.hidden]="!user.visible"> <!-- Añadir esta clase -->
+           [class.hidden]="!user.visible"> <!-- Aplica estilo si el usuario está oculto -->
 
         <div class="user-header">
           <img [src]="user.profilePicture || 'assets/default-profile.jpg'" 
@@ -39,6 +39,7 @@
           <button class="btn-hide" (click)="marcarUsuarioInvisible(user)">
             <i class="material-icons">{{ user.visible ? 'visibility_off' : 'visibility' }}</i> 
             {{ user.visible ? 'Ocultar' : 'Mostrar' }}
+            <span *ngIf="!user.visible" class="status-badge">(Oculto)</span>
           </button>
           <button class="btn-delete" (click)="eliminarUsuario(user)">
             <i class="material-icons">delete</i> Eliminar
@@ -142,6 +143,7 @@
         <p><strong>ID:</strong> {{ selectedUser._id }}</p>
         <p><strong>Email:</strong> {{ selectedUser.email }}</p>
         <p><strong>Nivel:</strong> {{ selectedUser.level }}</p>
+        <p><strong>Estado:</strong> {{ selectedUser.visible ? 'Visible' : 'Oculto' }}</p>
         <p><strong>Biografía:</strong></p>
         <div class="bio-text">{{ selectedUser.bio || 'Este usuario no tiene biografía.' }}</div>
       </div>

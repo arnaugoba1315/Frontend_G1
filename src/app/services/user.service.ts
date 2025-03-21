@@ -12,10 +12,14 @@ export class UserService {
   constructor(private http: HttpClient) { }
 
   // Obtener usuarios paginados
-  getUsers(page: number = 1, limit: number = 5): Observable<any> {
-    const params = new HttpParams()
+  getUsers(page: number = 1, limit: number = 5, includeHidden: boolean = false): Observable<any> {
+    let params = new HttpParams()
       .set('page', page.toString())
       .set('limit', limit.toString());
+    
+    if (includeHidden) {
+      params = params.set('includeInvisible', 'true');
+    }
     
     return this.http.get<any>(this.apiUrl, { params });
   }
@@ -38,5 +42,10 @@ export class UserService {
   // Eliminar un usuario
   deleteUser(userId: string): Observable<any> {
     return this.http.delete(`${this.apiUrl}/${userId}`);
+  }
+  
+  // Cambiar visibilidad de un usuario
+  toggleUserVisibility(userId: string): Observable<any> {
+    return this.http.put(`${this.apiUrl}/${userId}/toggle-visibility`, {});
   }
 }

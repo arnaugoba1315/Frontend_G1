@@ -25,24 +25,18 @@ export class BackOfficeComponent implements OnInit {
   error = '';
   usuariosListados = false;
   showCreateModal = false;
-  showEditModal = false; // Propiedad para mostrar/ocultar el modal de edición
-  showViewModal = false; // Propiedad para mostrar/ocultar el modal de visualización
-  selectedUser: User | null = null; // Usuario seleccionado para editar o ver
+  showEditModal = false;
+  showViewModal = false;
+  selectedUser: User | null = null;
   
-  // Datos de ejemplo completos (para simulación)
+  // Datos de ejemplo para simulación
   allMockUsers: User[] = [
-    { _id: '1', username: 'Usuario1', email: 'usuario1@example.com', level: 1, bio: 'Bio de usuario 1', profilePicture: '', visible: true },
-    { _id: '2', username: 'Usuario2', email: 'usuario2@example.com', level: 2, bio: 'Bio de usuario 2', profilePicture: '', visible: true },
-    { _id: '3', username: 'Usuario3', email: 'usuario3@example.com', level: 3, bio: 'Bio de usuario 3', profilePicture: '', visible: true },
-    { _id: '4', username: 'Usuario4', email: 'usuario4@example.com', level: 1, bio: 'Bio de usuario 4', profilePicture: '', visible: true },
-    { _id: '5', username: 'Usuario5', email: 'usuario5@example.com', level: 2, bio: 'Bio de usuario 5', profilePicture: '', visible: true },
-    { _id: '6', username: 'Usuario6', email: 'usuario6@example.com', level: 3, bio: 'Bio de usuario 6', profilePicture: '', visible: true },
-    { _id: '7', username: 'Usuario7', email: 'usuario7@example.com', level: 1, bio: 'Bio de usuario 7', profilePicture: '', visible: true },
-    { _id: '8', username: 'Usuario8', email: 'usuario8@example.com', level: 2, bio: 'Bio de usuario 8', profilePicture: '', visible: true },
-    { _id: '9', username: 'Usuario9', email: 'usuario9@example.com', level: 3, bio: 'Bio de usuario 9', profilePicture: '', visible: true },
-    { _id: '10', username: 'Usuario10', email: 'usuario10@example.com', level: 1, bio: 'Bio de usuario 10', profilePicture: '', visible: true },
-    { _id: '11', username: 'Usuario11', email: 'usuario11@example.com', level: 2, bio: 'Bio de usuario 11', profilePicture: '', visible: true },
-    { _id: '12', username: 'Usuario12', email: 'usuario12@example.com', level: 3, bio: 'Bio de usuario 12', profilePicture: '', visible: true }
+    { _id: '1', username: 'Usuario1', email: 'usuario1@example.com', level: 1, bio: 'Bio de usuario 1', profilePicture: '', visible: true, visibility: true },
+    { _id: '2', username: 'Usuario2', email: 'usuario2@example.com', level: 2, bio: 'Bio de usuario 2', profilePicture: '', visible: true, visibility: true },
+    { _id: '3', username: 'Usuario3', email: 'usuario3@example.com', level: 3, bio: 'Bio de usuario 3', profilePicture: '', visible: false, visibility: false },
+    { _id: '4', username: 'Usuario4', email: 'usuario4@example.com', level: 1, bio: 'Bio de usuario 4', profilePicture: '', visible: true, visibility: true },
+    { _id: '5', username: 'Usuario5', email: 'usuario5@example.com', level: 2, bio: 'Bio de usuario 5', profilePicture: '', visible: false, visibility: false },
+    { _id: '6', username: 'Usuario6', email: 'usuario6@example.com', level: 3, bio: 'Bio de usuario 6', profilePicture: '', visible: true, visibility: true },
   ];
   
   constructor(
@@ -51,24 +45,31 @@ export class BackOfficeComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    // No cargamos usuarios automáticamente, esperamos a que el usuario haga clic en el botón
+    // Para cargar automáticamente los usuarios al iniciar la aplicación, descomenta la siguiente línea:
+    // this.obtenerUsuarios();
   }
 
   obtenerUsuarios(): void {
     this.loading = true;
     
-    // En un entorno real, llamarías al servicio con los parámetros de paginación:
-    this.userService.getUsers(this.currentPage, this.itemsPerPage)
+    // Obtenir tots els usuaris, incloent els ocults
+    this.userService.getUsers(this.currentPage, this.itemsPerPage, true)
       .subscribe({
         next: (response) => {
+          console.log('Respuesta del servidor:', response); // Log para depuración
+          console.log('Usuarios recibidos:', response.users);
+          
           if (response.users && response.users.length > 0) {
             this.users = response.users.map((user: User) => ({
               ...user,
-              visible: user.visible !== undefined ? user.visible : true // Inicializar visible a true si no está definido
+              // Utilitzar qualsevol de les dues propietats, prioritzant visibility (del backend)
+              visible: user.visibility !== undefined ? user.visibility : (user.visible !== undefined ? user.visible : true)
             }));
+            console.log('Usuarios procesados:', this.users); // Log para depuración
             this.totalUsers = response.totalUsers;
             this.totalPages = response.totalPages;
           } else {
+            console.log('No se encontraron usuarios, usando datos de simulación'); // Log para depuración
             // Simulación de paginación con datos de prueba
             this.simularPaginacion();
           }
@@ -97,7 +98,7 @@ export class BackOfficeComponent implements OnInit {
     // Obtener los usuarios de la página actual
     this.users = this.allMockUsers.slice(startIndex, endIndex).map(user => ({
       ...user,
-      visible: user.visible !== undefined ? user.visible : true // Inicializar visible a true si no está definido
+      visible: user.visibility !== undefined ? user.visibility : (user.visible !== undefined ? user.visible : true)
     }));
     
     // Calcular el total de usuarios y páginas
@@ -142,10 +143,23 @@ export class BackOfficeComponent implements OnInit {
   
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        user.visible = !user.visible;
-        console.log(`Usuario ${user._id} ${user.visible ? 'visible' : 'ocultado'}`);
-        // Aquí podrías llamar a un servicio para actualizar el estado del usuario en el backend si es necesario
-        // this.userService.updateUserVisibility(user._id, user.visible).subscribe();
+        this.loading = true;
+        
+        // Llamamos a nuestro servicio para cambiar la visibilidad en el backend
+        this.userService.toggleUserVisibility(user._id).subscribe({
+          next: (response) => {
+            console.log(`Usuario ${user._id} ${response.user.visibility ? 'visible' : 'ocultado'}`);
+            // Actualizamos ambas propiedades para mantener consistencia
+            user.visible = response.user.visibility;
+            user.visibility = response.user.visibility;
+            this.loading = false;
+          },
+          error: (error) => {
+            console.error('Error al cambiar visibilidad del usuario:', error);
+            this.error = 'Error al cambiar la visibilidad del usuario';
+            this.loading = false;
+          }
+        });
       }
     });
   }
