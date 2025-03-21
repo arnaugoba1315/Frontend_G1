@@ -19,12 +19,12 @@ export class BackOfficeComponent implements OnInit {
   currentPage = 1;
   itemsPerPage = 10;
   totalPages = 0;
-  totalUsers = 0;
-  pages: number[] = [];
+  totalUsers = 0; // Corregido: totalUsers en lugar de totalItems
+  pages: number[] = []; // Corregido: pages como propiedad del componente
   loading = false;
   error = '';
-  usuariosListados = false;
-  showCreateModal = false;
+  usuariosListados = false; // Corregido: usuariosListados como propiedad
+  showCreateModal = false; // Corregido: showCreateModal como propiedad
   
   constructor(
     private userService: UserService,
@@ -35,6 +35,7 @@ export class BackOfficeComponent implements OnInit {
     // No cargamos usuarios automáticamente, esperamos a que el usuario haga clic en el botón
   }
 
+  // Corregido: obtenerUsuarios en lugar de loadUsers
   obtenerUsuarios(): void {
     this.loading = true;
     this.userService.getUsers(this.currentPage, this.itemsPerPage)
@@ -97,16 +98,19 @@ export class BackOfficeComponent implements OnInit {
     this.obtenerUsuarios();
   }
 
+  // Corregido: showCreateUserForm en lugar de showCreateForm
   showCreateUserForm(): void {
     this.showCreateModal = true;
   }
 
+  // Corregido: editarUsuario en lugar de editUser
   editarUsuario(user: User): void {
     console.log('Editar usuario:', user);
     // Aquí implementarías la lógica para editar un usuario
     // Por ejemplo, podrías abrir un modal de edición
   }
 
+  // Corregido: marcarUsuarioInvisible en lugar de hideUser
   marcarUsuarioInvisible(user: User): void {
     console.log('Ocultar usuario:', user);
     const dialogRef = this.dialog.open(ConfirmDialogComponent, {
@@ -122,6 +126,7 @@ export class BackOfficeComponent implements OnInit {
     });
   }
 
+  // Corregido: eliminarUsuario en lugar de deleteUser
   eliminarUsuario(user: User): void {
     console.log('Eliminar usuario:', user);
     const dialogRef = this.dialog.open(ConfirmDialogComponent, {
@@ -130,6 +135,7 @@ export class BackOfficeComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
+        // Corrección: Usar _id como string en lugar de id como número
         this.userService.deleteUser(user._id).subscribe({
           next: () => {
             console.log(`Usuario ${user._id} eliminado`);
@@ -143,12 +149,14 @@ export class BackOfficeComponent implements OnInit {
     });
   }
 
+  // Corregido: verDetallesUsuario en lugar de showUserDetails
   verDetallesUsuario(user: User): void {
     console.log('Ver detalles de usuario:', user);
     // Aquí implementarías la lógica para mostrar detalles del usuario
     // Por ejemplo, podrías abrir un modal con los detalles
   }
 
+  // Corregido: onUserCreated en lugar de handleUserCreated
   onUserCreated(success: boolean): void {
     this.showCreateModal = false;
     if (success) {
@@ -156,6 +164,7 @@ export class BackOfficeComponent implements OnInit {
     }
   }
 
+  // Track by function para mejorar el rendimiento de ngFor
   trackByUserId(index: number, user: User): string {
     return user._id;
   }

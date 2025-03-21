@@ -1,29 +1,29 @@
-// colaboradores.component.ts
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { UserService } from '../services/user.service';
-import { User } from '../models/user.model';
 import { MatDialog } from '@angular/material/dialog';
 import { ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog.component';
+import { User } from '../models/user.model';
 
 @Component({
   selector: 'app-colaboradores',
-  standalone: true,
-  imports: [CommonModule, FormsModule],
   templateUrl: './colaboradores.component.html',
-  styleUrls: ['./colaboradores.component.css']
+  styleUrls: ['./colaboradores.component.css'],
+  standalone: true,
+  imports: [CommonModule, FormsModule]
 })
 export class ColaboradoresComponent implements OnInit {
-  // Lista de usuarios
   users: User[] = [];
-  
-  // Paginación
+  filteredUsers: User[] = [];
+  searchTerm = '';
   currentPage = 1;
   itemsPerPage = 10;
-  totalItems = 0;
   totalPages = 0;
+  totalItems = 0;
   pages: number[] = [];
+  loading = false;
+  error = '';
 
   constructor(
     private userService: UserService,
@@ -31,69 +31,81 @@ export class ColaboradoresComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.obtenerUsuarios();
+    this.loadUsers();
   }
 
-  // Obtener usuarios con paginación
-  obtenerUsuarios(): void {
-    this.userService.getUsers(this.currentPage, this.itemsPerPage).subscribe({
-      next: (data) => {
-        this.users = data.users;
-        this.totalItems = data.totalUsers;
-        this.totalPages = data.totalPages;
-        this.generatePages();
-      },
-      error: (error) => {
-        console.error('Error al obtener usuarios:', error);
-      }
-    });
+  loadUsers(): void {
+    this.loading = true;
+    this.userService.getUsers(this.currentPage, this.itemsPerPage)
+      .subscribe({
+        next: (response) => {
+          this.users = response.users;
+          this.filteredUsers = [...this.users];
+          this.totalItems = response.totalUsers;
+          this.totalPages = response.totalPages;
+          this.generatePageNumbers();
+          this.loading = false;
+        },
+        error: (err) => {
+          console.error('Error loading users:', err);
+          this.error = 'Error loading users. Please try again later.';
+          this.loading = false;
+        }
+      });
   }
 
-  // Generar números de página
-  generatePages(): void {
+  generatePageNumbers(): void {
     this.pages = [];
     for (let i = 1; i <= this.totalPages; i++) {
       this.pages.push(i);
     }
   }
 
-  // Cambiar página
+  search(): void {
+    if (!this.searchTerm.trim()) {
+      this.filteredUsers = [...this.users];
+      return;
+    }
+
+    const term = this.searchTerm.toLowerCase();
+    this.filteredUsers = this.users.filter(user => 
+      user.username.toLowerCase().includes(term) || 
+      user.email.toLowerCase().includes(term)
+    );
+  }
+
+  clearSearch(): void {
+    this.searchTerm = '';
+    this.filteredUsers = [...this.users];
+  }
+
   changePage(page: number): void {
     if (page < 1 || page > this.totalPages) {
       return;
     }
     this.currentPage = page;
-    this.obtenerUsuarios();
+    this.loadUsers();
   }
 
-  // Cambiar registros por página
-  cambiarRegistrosPorPagina(): void {
-    this.currentPage = 1; // Volver a primera página
-    this.obtenerUsuarios();
+  editUser(userId: string): void {
+    console.log('Editar usuario con ID:', userId);
+    // Implementación de la edición
   }
 
-  // Editar usuario
-  editUser(user: User): void {
-    console.log('Editar usuario:', user);
-    // Implementar navegación a página de edición
-  }
+  deleteUser(userId: string): void {
+    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+      data: { message: '¿Estás seguro de que deseas eliminar este usuario?' }
+    });
 
-  // Eliminar usuario
-  deleteUser(index: number): void {
-    const dialogRef = this.dialog.open(ConfirmDialogComponent);
-    
-    dialogRef.afterClosed().subscribe((confirmed: boolean) => {
-      if (confirmed && this.users[index]) {
-        const userId = this.users[index].id;
-        
-        // Si el backend está implementado para eliminar
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        // Usar userId como string, no como número
         this.userService.deleteUser(userId).subscribe({
           next: () => {
-            this.users.splice(index, 1);
-            // Refrescar la lista si es necesario
-            this.obtenerUsuarios();
+            console.log(`Usuario ${userId} eliminado correctamente`);
+            this.loadUsers();
           },
-          error: (error: any) => {
+          error: (error) => {
             console.error('Error al eliminar usuario:', error);
           }
         });
@@ -101,8 +113,8 @@ export class ColaboradoresComponent implements OnInit {
     });
   }
 
-  // Para optimizar rendimiento con ngFor
-  trackByUserId(index: number, user: User): number {
-    return user.id;
+  // Usar _id como string para el trackBy
+  trackByUserId(index: number, user: User): string {
+    return user._id;
   }
 }
