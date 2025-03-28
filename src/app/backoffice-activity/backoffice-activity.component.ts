@@ -134,35 +134,35 @@ export class ActivitiesComponent implements OnInit {
     // this.obtenerActividades();
   }
 
+  paginatedActivities: any[] = [];
+
   obtenerActividades(): void {
     this.loading = true;
     
     this.activityService.getActivities(this.currentPage, this.itemsPerPage)
       .subscribe({
         next: (response) => {
-          console.log('Actividades cargadas:', response);
+          console.log('Datos recibidos del servidor:', response);
           
-          if (response && Array.isArray(response)) {
-            // Si la respuesta es directamente un array de actividades
+          if (Array.isArray(response)) {
             this.activities = response;
             this.totalActivities = response.length;
-            // Puedes necesitar ajustar cómo obtienes el total de páginas
             this.totalPages = Math.ceil(this.totalActivities / this.itemsPerPage);
           } else if (response && response.activities) {
-            // Si la respuesta es un objeto con una propiedad 'activities'
             this.activities = response.activities;
-            this.totalActivities = response.totalActivities || response.activities.length;
+            this.totalActivities = response.totalUsers || response.activities.length;
             this.totalPages = response.totalPages || Math.ceil(this.totalActivities / this.itemsPerPage);
           } else {
-            // Fallback a datos de simulación si no hay datos
-            console.log('No se encontraron actividades, usando datos de simulación');
-            this.simularPaginacion();
+            console.warn('No se recibieron actividades del servidor');
+            this.activities = [];
+            this.totalActivities = 0;
+            this.totalPages = 0;
           }
           
           this.loadAuthorNames();
-          
           this.filteredActivities = [...this.activities];
           this.generatePageNumbers();
+          this.updatePaginatedActivities(); // Update paginated activities here
           this.loading = false;
           this.activitiesListed = true;
         },
@@ -170,11 +170,8 @@ export class ActivitiesComponent implements OnInit {
           console.error('Error al cargar actividades:', err);
           this.error = 'Error al cargar actividades';
           this.loading = false;
-          
-          // En caso de error, simulamos paginación con datos de prueba
-          this.simularPaginacion();
-          this.filteredActivities = [...this.activities];
-          this.generatePageNumbers();
+          this.activities = [];
+          this.filteredActivities = [];
           this.activitiesListed = true;
         }
       });
@@ -185,14 +182,14 @@ export class ActivitiesComponent implements OnInit {
       if (activity.author) {
         this.userService.getUserById(activity.author).subscribe({
           next: (user) => {
-            activity.authorName = user ? user.username : 'Desconocido';
+            activity.authorName = user ? user.username : 'Desconegut';
           },
           error: () => {
-            activity.authorName = 'Desconocido';
+            activity.authorName = 'Desconegut';
           }
         });
       } else {
-        activity.authorName = 'Desconocido';
+        activity.authorName = 'Desconegut';
       }
     });
   }
@@ -202,12 +199,18 @@ export class ActivitiesComponent implements OnInit {
     const startIndex = (this.currentPage - 1) * this.itemsPerPage;
     const endIndex = Math.min(startIndex + this.itemsPerPage, this.allMockActivities.length);
     
-    // Obtenir las activitats de la pàgina actual
     this.activities = this.allMockActivities.slice(startIndex, endIndex);
+    this.filteredActivities = [...this.activities];
+    this.updatePaginatedActivities(); // Update paginated activities here
     
-    // Calcular el total
     this.totalActivities = this.allMockActivities.length;
     this.totalPages = Math.ceil(this.totalActivities / this.itemsPerPage);
+  }
+
+  updatePaginatedActivities(): void {
+    const startIndex = (this.currentPage - 1) * this.itemsPerPage;
+    const endIndex = startIndex + this.itemsPerPage;
+    this.paginatedActivities = this.filteredActivities.slice(startIndex, endIndex);
   }
 
   generatePageNumbers(): void {
@@ -222,7 +225,7 @@ export class ActivitiesComponent implements OnInit {
       return;
     }
     this.currentPage = page;
-    this.obtenerActividades();
+    this.updatePaginatedActivities();
   }
   
   // Filtrar activitats per tipus
@@ -234,6 +237,8 @@ export class ActivitiesComponent implements OnInit {
         activity.type === this.selectedType
       );
     }
+    this.currentPage = 1; // Reset to the first page after filtering
+    this.updatePaginatedActivities();
   }
 
   showCreateActivityForm(): void {
@@ -285,10 +290,8 @@ export class ActivitiesComponent implements OnInit {
 
   verDetallesActividad(activity: any): void {
     console.log('Ver detalles de actividad:', activity);
-    this.selectedActivity = { ...activity }; // Crear una copia para no modificar la original
+    this.selectedActivity = { ...activity }; // Crear una copia per no modificar la original
     this.showViewModal = true;
-    this.showEditModal = false;
-    this.showCreateModal = false;
   }
 
   onActivityCreated(success: boolean): void {

@@ -2,10 +2,10 @@
   <!-- Navegació per pestanyes per escollir entre usuaris o activitats -->
   <div class="navigation-tabs">
     <button class="nav-tab" [class.active]="activeTab === 'users'" (click)="setActiveTab('users')">
-      <i class="material-icons">people</i> Usuarios
+      <i class="material-icons">people</i> Usuaris
     </button>
     <button class="nav-tab" [class.active]="activeTab === 'activities'" (click)="setActiveTab('activities')">
-      <i class="material-icons">directions_run</i> Actividades
+      <i class="material-icons">directions_run</i> Activitats
     </button>
   </div>
   
@@ -14,14 +14,14 @@
     <!-- Botón para crear usuario -->
     <div class="action-buttons">
       <button class="btn-create" (click)="showCreateUserForm()">
-        <i class="material-icons">add</i> Crear nuevo usuario
+        <i class="material-icons">add</i> Crear nou usuari
       </button>
     </div>
     
     <!-- Inicialment només mostrar el botó de llistar usuaris -->
     <div class="button-container" *ngIf="!usuariosListados">
       <button class="btn-listar" (click)="obtenerUsuarios()">
-        Listar todos los usuarios
+        Llistar tots els usuaris
       </button>
     </div>
     
@@ -34,14 +34,14 @@
              [class.hidden]="!user.visible">
 
           <div class="user-header">
-            <img [src]="user.profilePicture || 'assets/default-profile.jpg'" 
+            <img [src]="user.profilePicture || 'https://cdn-icons-png.freepik.com/512/456/456212.png'" 
                  alt="Foto de perfil" 
                  class="profile-image">
             <h3 class="user-name">{{ user.username }}</h3>
           </div>
           <div class="user-info">
             <p><strong>Email:</strong> {{ user.email }}</p>
-            <p><strong>Nivel:</strong> {{ user.level || 'N/A' }}</p>
+            <p><strong>Nivell:</strong> {{ user.level || 'N/A' }}</p>
             <p class="user-bio"><strong>Bio:</strong> {{ user.bio || 'Sin biografía' }}</p>
           </div>
           <div class="user-actions">
@@ -57,7 +57,7 @@
               <i class="material-icons">delete</i> Eliminar
             </button>
             <button class="btn-view" (click)="verDetallesUsuario(user)">
-              <i class="material-icons">visibility</i> Ver
+              <i class="material-icons">visibility</i> Detalls
             </button>
           </div>
         </div>
@@ -113,7 +113,7 @@
     <div class="modal-body">
       <form class="edit-form">
         <div class="form-group">
-          <label for="edit-username">Nombre de usuario</label>
+          <label for="edit-username">Nom d'usuari</label>
           <input type="text" id="edit-username" [(ngModel)]="selectedUser.username" name="username" class="form-control">
         </div>
         
@@ -123,23 +123,23 @@
         </div>
         
         <div class="form-group">
-          <label for="edit-level">Nivel</label>
+          <label for="edit-level">Nivell</label>
           <input type="number" id="edit-level" [(ngModel)]="selectedUser.level" name="level" class="form-control">
         </div>
         
         <div class="form-group">
-          <label for="edit-bio">Biografía</label>
+          <label for="edit-bio">Biografia</label>
           <textarea id="edit-bio" [(ngModel)]="selectedUser.bio" name="bio" class="form-control" rows="3"></textarea>
         </div>
         
         <div class="form-group">
-          <label for="edit-profilePicture">URL de imagen de perfil</label>
+          <label for="edit-profilePicture">URL de imatge de perfil</label>
           <input type="text" id="edit-profilePicture" [(ngModel)]="selectedUser.profilePicture" name="profilePicture" class="form-control">
         </div>
         
         <div class="form-actions">
           <button type="button" class="btn-cancel" (click)="showEditModal = false">Cancelar</button>
-          <button type="button" class="btn-save" (click)="onUserEdited(true)">Guardar cambios</button>
+          <button type="button" class="btn-save" (click)="onUserEdited(true)">Guardar canvis</button>
         </div>
       </form>
     </div>
@@ -148,26 +148,26 @@
   <!-- Modal para ver detalles de usuario -->
   <div class="full-screen-form view-details" *ngIf="showViewModal && selectedUser">
     <div class="modal-header">
-      <h2>Detalles del Usuario</h2>
+      <h2>Detalls de l'Usuari</h2>
       <button class="close-btn" (click)="closeViewModal()">×</button>
     </div>
     <div class="modal-body user-details">
       <div class="user-profile">
-        <img [src]="selectedUser.profilePicture || 'assets/default-profile.jpg'" alt="Foto de perfil" class="profile-image-large">
+        <img [src]="selectedUser.profilePicture || 'https://cdn-icons-png.freepik.com/512/456/456212.png'" alt="Foto de perfil" class="profile-image-large">
         <h3>{{ selectedUser.username }}</h3>
       </div>
       
       <div class="user-details-info">
         <p><strong>ID:</strong> {{ selectedUser._id }}</p>
         <p><strong>Email:</strong> {{ selectedUser.email }}</p>
-        <p><strong>Nivel:</strong> {{ selectedUser.level }}</p>
-        <p><strong>Estado:</strong> {{ selectedUser.visible ? 'Visible' : 'Oculto' }}</p>
-        <p><strong>Biografía:</strong></p>
+        <p><strong>Nivell:</strong> {{ selectedUser.level }}</p>
+        <p><strong>Estat:</strong> {{ selectedUser.visible ? 'Visible' : 'Oculto' }}</p>
+        <p><strong>Biografia:</strong></p>
         <div class="bio-text">{{ selectedUser.bio || 'Este usuario no tiene biografía.' }}</div>
       </div>
       
       <div class="form-actions">
-        <button type="button" class="btn-back" (click)="closeViewModal()">Volver a la lista</button>
+        <button type="button" class="btn-back" (click)="closeViewModal()">Tornar a la llista</button>
       </div>
     </div>
   </div>

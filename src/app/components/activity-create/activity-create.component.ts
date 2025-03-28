@@ -45,19 +45,27 @@ export class ActivityCreateComponent implements OnInit {
   }
   
   loadUsers(): void {
-    this.userService.getUsers().subscribe({
-      next: (response) => {
-        this.users = response.users || [];
-      },
-      error: (err) => {
-        console.error('Error cargando usuarios:', err);
-        this.users = [
-          { _id: '1', username: 'Usuario1' },
-          { _id: '2', username: 'Usuario2' },
-          { _id: '3', username: 'Usuario3' }
-        ];
-      }
-    });
+    this.loading = true;
+    
+    this.userService.getUsers(1, 100, true) // Obtenir fins a 100 usuaris, inclosos els ocults
+      .subscribe({
+        next: (response) => {
+          this.loading = false;
+          
+          if (response && response.users && response.users.length > 0) {
+            this.users = response.users;
+            console.log('Usuarios cargados:', this.users);
+          } else {
+            console.warn('No se encontraron usuarios en la base de datos');
+            this.error = 'No se encontraron usuarios para asignar como autores';
+          }
+        },
+        error: (err) => {
+          this.loading = false;
+          console.error('Error cargando usuarios:', err);
+          this.error = 'Error al cargar la lista de usuarios';
+        }
+      });
   }
   
   onSubmit(): void {

@@ -2,26 +2,26 @@
     <!-- Botó per crear activitat -->
     <div class="action-buttons">
       <button class="btn-create" (click)="showCreateActivityForm()">
-        <i class="material-icons">add</i> Crear nueva actividad
+        <i class="material-icons">add</i> Crear nova activitat
       </button>
     </div>
     
     <!-- Inicialment només mostrar botó d'inicialitzar -->
     <div class="button-container" *ngIf="!activitiesListed">
       <button class="btn-listar" (click)="obtenerActividades()">
-        Listar todas las actividades
+        Llistar totes les activitats
       </button>
     </div>
     
     <!-- Llista paginada d'activitats -->
     <div class="activities-container" *ngIf="activitiesListed">
-      <h2>Actividades</h2>
+      <h2>Activitats</h2>
       
       <!-- Filtre per tipus d'activitat -->
       <div class="filter-container">
-        <label for="activity-type">Filtrar por tipo:</label>
+        <label for="activity-type">Filtrar por tipus:</label>
         <select id="activity-type" [(ngModel)]="selectedType" (change)="filterActivities()">
-          <option value="">Todos</option>
+          <option value="">Tots</option>
           <option value="running">Running</option>
           <option value="cycling">Cycling</option>
           <option value="hiking">Hiking</option>
@@ -29,26 +29,23 @@
         </select>
       </div>
       
-      <!-- Taula d'activitats -->
+      <!-- Grid container for activities -->
       <div class="activities-grid">
-        <div *ngFor="let activity of filteredActivities; trackBy: trackByActivityId" 
-             class="activity-card">
-  
+        <div *ngFor="let activity of paginatedActivities; trackBy: trackByActivityId" 
+            class="activity-card">
           <div class="activity-header">
             <div class="activity-type-badge" [ngClass]="activity.type">
               {{ activity.type }}
             </div>
             <h3 class="activity-name">{{ activity.name }}</h3>
           </div>
-          
           <div class="activity-info">
-            <p><strong>Autor:</strong> {{ activity.authorName || 'Desconocido' }}</p>
-            <p><strong>Fecha:</strong> {{ activity.startTime | date:'dd/MM/yyyy HH:mm' }}</p>
-            <p><strong>Duración:</strong> {{ formatDuration(activity.duration) }}</p>
-            <p><strong>Distancia:</strong> {{ (activity.distance / 1000).toFixed(2) }} km</p>
-            <p><strong>Velocidad media:</strong> {{ activity.averageSpeed.toFixed(1) }} km/h</p>
+            <p><strong>Autor:</strong> {{ activity.authorName || 'Desconegut' }}</p>
+            <p><strong>Data:</strong> {{ activity.startTime | date:'dd/MM/yyyy HH:mm' }}</p>
+            <p><strong>Duració:</strong> {{ activity.duration }}min</p>
+            <p><strong>Distància:</strong> {{ (activity.distance / 1000).toFixed(2) }} km</p>
+            <p><strong>Velocitat mitja:</strong> {{ activity.averageSpeed.toFixed(1) }} km/h</p>
           </div>
-          
           <div class="activity-actions">
             <button class="btn-edit" (click)="editarActividad(activity)">
               <i class="material-icons">edit</i> Editar
@@ -57,15 +54,22 @@
               <i class="material-icons">delete</i> Eliminar
             </button>
             <button class="btn-view" (click)="verDetallesActividad(activity)">
-              <i class="material-icons">visibility</i> Ver
+              <i class="material-icons">visibility</i> Detalls
             </button>
           </div>
         </div>
       </div>
-      
+ 
       <!-- Missatge si no hi ha activitats -->
-      <div *ngIf="filteredActivities.length === 0" class="no-data">
-        No se encontraron actividades.
+      <div *ngIf="filteredActivities.length === 0" class="no-activities">
+        <div class="empty-state">
+          <i class="material-icons large">hiking</i>
+          <h3>No s'han trobat activitats</h3>
+          <p>No hi ha activitats que coincideixin amb els criteris de búsqueda.</p>
+          <button class="btn-create" (click)="showCreateActivityForm()">
+            <i class="material-icons">add</i> Crear nova activitat
+          </button>
+        </div>
       </div>
       
       <!-- Paginació -->
@@ -93,8 +97,8 @@
       </div>
       
       <div class="pagination-info" *ngIf="totalActivities > 0">
-        Mostrando página {{ currentPage }} de {{ totalPages }} 
-        ({{ totalActivities }} actividades en total)
+        Mostrant pàgina {{ currentPage }} de {{ totalPages }} 
+        ({{ totalActivities }} activitats en total)
       </div>
     </div>
   
@@ -106,19 +110,19 @@
     <!-- Editar activitat -->
     <div class="full-screen-form" *ngIf="showEditModal && selectedActivity">
       <div class="modal-header">
-        <h2>Editar Actividad: {{ selectedActivity.name }}</h2>
+        <h2>Editar Activitat: {{ selectedActivity.name }}</h2>
         <button class="close-btn" (click)="showEditModal = false">×</button>
       </div>
       <div class="modal-body">
         <form class="edit-form">
           <!-- Camps per editar activitat -->
           <div class="form-group">
-            <label for="edit-name">Nombre de la actividad</label>
+            <label for="edit-name">Nom de l'activitat</label>
             <input type="text" id="edit-name" [(ngModel)]="selectedActivity.name" name="name" class="form-control">
           </div>
           
           <div class="form-group">
-            <label for="edit-type">Tipo</label>
+            <label for="edit-type">Tipus</label>
             <select id="edit-type" [(ngModel)]="selectedActivity.type" name="type" class="form-control">
               <option value="running">Running</option>
               <option value="cycling">Cycling</option>
@@ -128,50 +132,50 @@
           </div>
           
           <div class="form-group">
-            <label for="edit-startTime">Fecha y hora de inicio</label>
+            <label for="edit-startTime">Dia i hora d'inici</label>
             <input type="datetime-local" id="edit-startTime" 
                    [(ngModel)]="formattedStartTime" name="startTime" class="form-control">
           </div>
           
           <div class="form-group">
-            <label for="edit-endTime">Fecha y hora de finalización</label>
+            <label for="edit-endTime">Dia i hora de finalització</label>
             <input type="datetime-local" id="edit-endTime" 
                    [(ngModel)]="formattedEndTime" name="endTime" class="form-control">
           </div>
           
           <div class="form-group">
-            <label for="edit-duration">Duración (minutos)</label>
+            <label for="edit-duration">Duració (minuts)</label>
             <input type="number" id="edit-duration" [(ngModel)]="selectedActivity.duration" 
                    name="duration" class="form-control">
           </div>
           
           <div class="form-group">
-            <label for="edit-distance">Distancia (metros)</label>
+            <label for="edit-distance">Distància (metres)</label>
             <input type="number" id="edit-distance" [(ngModel)]="selectedActivity.distance" 
                    name="distance" class="form-control">
           </div>
           
           <div class="form-group">
-            <label for="edit-elevationGain">Ganancia de elevación (metros)</label>
+            <label for="edit-elevationGain">Desnivell positiu (metres)</label>
             <input type="number" id="edit-elevationGain" [(ngModel)]="selectedActivity.elevationGain" 
                    name="elevationGain" class="form-control">
           </div>
           
           <div class="form-group">
-            <label for="edit-averageSpeed">Velocidad media (km/h)</label>
+            <label for="edit-averageSpeed">Velocitat mitjana (km/h)</label>
             <input type="number" id="edit-averageSpeed" [(ngModel)]="selectedActivity.averageSpeed" 
                    name="averageSpeed" class="form-control">
           </div>
           
           <div class="form-group">
-            <label for="edit-caloriesBurned">Calorías quemadas</label>
+            <label for="edit-caloriesBurned">Calories cremades</label>
             <input type="number" id="edit-caloriesBurned" [(ngModel)]="selectedActivity.caloriesBurned" 
                    name="caloriesBurned" class="form-control">
           </div>
           
           <div class="form-actions">
             <button type="button" class="btn-cancel" (click)="showEditModal = false">Cancelar</button>
-            <button type="button" class="btn-save" (click)="onActivityEdited(true)">Guardar cambios</button>
+            <button type="button" class="btn-save" (click)="onActivityEdited(true)">Guardar canvis</button>
           </div>
         </form>
       </div>
@@ -179,40 +183,80 @@
   
     <!-- Detalls de la activitat -->
     <div class="full-screen-form view-details" *ngIf="showViewModal && selectedActivity">
-      <div class="modal-header">
-        <h2>Detalles de la Actividad</h2>
-        <button class="close-btn" (click)="closeViewModal()">×</button>
-      </div>
-      <div class="modal-body activity-details">
-        <div class="activity-profile">
-          <div class="activity-type-badge large" [ngClass]="selectedActivity.type">
-            {{ selectedActivity.type }}
-          </div>
-          <h3>{{ selectedActivity.name }}</h3>
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2>Detalls de l'Activitat</h2>
+          <button class="close-btn" (click)="closeViewModal()">×</button>
         </div>
         
-        <div class="activity-details-info">
-          <p><strong>ID:</strong> {{ selectedActivity._id }}</p>
-          <p><strong>Autor:</strong> {{ selectedActivity.authorName || 'Desconocido' }}</p>
-          <p><strong>Fecha de inicio:</strong> {{ selectedActivity.startTime | date:'dd/MM/yyyy HH:mm' }}</p>
-          <p><strong>Fecha de finalización:</strong> {{ selectedActivity.endTime | date:'dd/MM/yyyy HH:mm' }}</p>
-          <p><strong>Duración:</strong> {{ formatDuration(selectedActivity.duration) }}</p>
-          <p><strong>Distancia:</strong> {{ (selectedActivity.distance / 1000).toFixed(2) }} km</p>
-          <p><strong>Ganancia de elevación:</strong> {{ selectedActivity.elevationGain }} m</p>
-          <p><strong>Velocidad media:</strong> {{ selectedActivity.averageSpeed.toFixed(1) }} km/h</p>
-          <p><strong>Calorías quemadas:</strong> {{ selectedActivity.caloriesBurned || 'No especificado' }}</p>
-          
-          <div *ngIf="selectedActivity.route && selectedActivity.route.length > 0">
-            <p><strong>Puntos de ruta:</strong> {{ selectedActivity.route.length }} puntos</p>
+        <div class="modal-body activity-details">
+          <div class="activity-profile">
+            <div class="activity-type-badge large" [ngClass]="selectedActivity.type">
+              {{ selectedActivity.type | uppercase }}
+            </div>
+            <h3 class="activity-title">{{ selectedActivity.name }}</h3>
           </div>
           
-          <div *ngIf="selectedActivity.musicPlaylist && selectedActivity.musicPlaylist.length > 0">
-            <p><strong>Playlist:</strong> {{ selectedActivity.musicPlaylist.length }} canciones</p>
+          <div class="details-container">
+            <div class="detail-item">
+              <div class="detail-label">ID:</div>
+              <div class="detail-value">{{ selectedActivity._id }}</div>
+            </div>
+            
+            <div class="detail-item">
+              <div class="detail-label">Autor:</div>
+              <div class="detail-value">{{ selectedActivity.authorName || 'Desconegut' }}</div>
+            </div>
+            
+            <div class="detail-item">
+              <div class="detail-label">Data d'inici:</div>
+              <div class="detail-value">{{ selectedActivity.startTime | date:'dd/MM/yyyy HH:mm' }}</div>
+            </div>
+            
+            <div class="detail-item">
+              <div class="detail-label">Data de fi:</div>
+              <div class="detail-value">{{ selectedActivity.endTime | date:'dd/MM/yyyy HH:mm' }}</div>
+            </div>
+            
+            <div class="detail-item">
+              <div class="detail-label">Duració:</div>
+              <div class="detail-value">{{ formatDuration(selectedActivity.duration) }}</div>
+            </div>
+            
+            <div class="detail-item">
+              <div class="detail-label">Distància:</div>
+              <div class="detail-value">{{ (selectedActivity.distance / 1000).toFixed(2) }} km</div>
+            </div>
+            
+            <div class="detail-item">
+              <div class="detail-label">Desnivell positiu:</div>
+              <div class="detail-value">{{ selectedActivity.elevationGain }} m</div>
+            </div>
+            
+            <div class="detail-item">
+              <div class="detail-label">Velocitat mitjana:</div>
+              <div class="detail-value">{{ selectedActivity.averageSpeed.toFixed(1) }} km/h</div>
+            </div>
+            
+            <div class="detail-item">
+              <div class="detail-label">Calories cremades:</div>
+              <div class="detail-value">{{ selectedActivity.caloriesBurned || 'No especificado' }}</div>
+            </div>
+            
+            <div class="detail-item" *ngIf="selectedActivity.route && selectedActivity.route.length > 0">
+              <div class="detail-label">Punts de ruta:</div>
+              <div class="detail-value">{{ selectedActivity.route.length }} punts</div>
+            </div>
+            
+            <div class="detail-item" *ngIf="selectedActivity.musicPlaylist && selectedActivity.musicPlaylist.length > 0">
+              <div class="detail-label">Playlist:</div>
+              <div class="detail-value">{{ selectedActivity.musicPlaylist.length }} cançons</div>
+            </div>
           </div>
-        </div>
-        
-        <div class="form-actions">
-          <button type="button" class="btn-back" (click)="closeViewModal()">Volver a la lista</button>
+          
+          <div class="form-actions">
+            <button type="button" class="btn-back" (click)="closeViewModal()">Tornar a la llista</button>
+          </div>
         </div>
       </div>
     </div>
