@@ -29,6 +29,12 @@ export class ActivityService {
     return this.http.get<any>(`${this.apiUrl}/${id}`);
   }
   
+  // Método para obtener detalles de actividad con el autor incluido (usando populate)
+  getActivityWithAuthorDetails(id: string): Observable<any> {
+    const url = `${this.apiUrl}/${id}?populate=author`;
+    return this.http.get<any>(url);
+  }
+  
   // Crear una nova
   createActivity(activityData: any): Observable<any> {
     return this.http.post(this.apiUrl, activityData);

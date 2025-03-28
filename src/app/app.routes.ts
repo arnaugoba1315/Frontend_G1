@@ -1,15 +1,10 @@
-import { Routes, RouterModule } from '@angular/router';
-import { NgModule } from '@angular/core';
+// app.routes.ts actualizado
+import { Routes } from '@angular/router';
 import { BackOfficeComponent } from './backoffice/backoffice.component';
 import { ActivitiesComponent } from './backoffice-activity/backoffice-activity.component';
 
 export const routes: Routes = [
-    {   path: 'admin', component: BackOfficeComponent    },
-    { path: 'activities', component: ActivitiesComponent }
+    { path: 'admin', component: BackOfficeComponent },
+    { path: 'activities', component: ActivitiesComponent },
+    { path: '', redirectTo: '/admin', pathMatch: 'full' }
 ];
-
-@NgModule({
-    imports: [RouterModule.forRoot(routes)],
-    exports: [RouterModule]
-  })
-  export class AppRoutingModule { }

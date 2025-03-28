@@ -154,15 +154,29 @@ export class ActivitiesComponent implements OnInit {
             this.totalPages = response.totalPages || Math.ceil(this.totalActivities / this.itemsPerPage);
           } else {
             console.warn('No se recibieron actividades del servidor');
-            this.activities = [];
-            this.totalActivities = 0;
-            this.totalPages = 0;
+            this.activities = this.allMockActivities.slice(0, this.itemsPerPage);
+            this.totalActivities = this.allMockActivities.length;
+            this.totalPages = Math.ceil(this.totalActivities / this.itemsPerPage);
           }
           
+          // Preprocesar las actividades para asegurar que el campo author sea una cadena
+          this.activities = this.activities.map(activity => {
+            // Manejar los casos donde el autor puede venir como objeto o como string
+            if (activity.author && typeof activity.author === 'object' && activity.author._id) {
+              // Si el autor viene como objeto, guardamos el ID como string
+              const authorId = activity.author._id;
+              const authorName = activity.author.username || 'Desconegut';
+              return { ...activity, author: authorId, authorName: authorName };
+            }
+            return activity;
+          });
+          
+          // Ahora cargar los nombres de los autores para los que solo tenemos ID
           this.loadAuthorNames();
+          
           this.filteredActivities = [...this.activities];
           this.generatePageNumbers();
-          this.updatePaginatedActivities(); // Update paginated activities here
+          this.updatePaginatedActivities();
           this.loading = false;
           this.activitiesListed = true;
         },
@@ -170,23 +184,38 @@ export class ActivitiesComponent implements OnInit {
           console.error('Error al cargar actividades:', err);
           this.error = 'Error al cargar actividades';
           this.loading = false;
-          this.activities = [];
-          this.filteredActivities = [];
+          
+          // En caso de error, usar datos de ejemplo
+          this.activities = this.allMockActivities.slice(0, this.itemsPerPage);
+          this.filteredActivities = [...this.activities];
+          this.totalActivities = this.allMockActivities.length;
+          this.totalPages = Math.ceil(this.totalActivities / this.itemsPerPage);
+          this.generatePageNumbers();
+          this.updatePaginatedActivities();
           this.activitiesListed = true;
         }
       });
   }
 
   loadAuthorNames(): void {
+    // Crear un mapa para almacenar los autores por ID y evitar solicitudes duplicadas
+    const userPromises: {[key: string]: Promise<any>} = {};
+    
     this.activities.forEach(activity => {
-      if (activity.author) {
-        this.userService.getUserById(activity.author).subscribe({
-          next: (user) => {
-            activity.authorName = user ? user.username : 'Desconegut';
-          },
-          error: () => {
-            activity.authorName = 'Desconegut';
-          }
+      if (activity.author && typeof activity.author === 'string') {
+        // Solo crear una promesa por cada ID de usuario único
+        if (!userPromises[activity.author]) {
+          userPromises[activity.author] = new Promise((resolve) => {
+            this.userService.getUserById(activity.author as string).subscribe({
+              next: (user) => resolve(user),
+              error: () => resolve(null)
+            });
+          });
+        }
+        
+        // Usar la promesa para asignar el nombre del autor
+        userPromises[activity.author].then(user => {
+          activity.authorName = user ? user.username : 'Desconegut';
         });
       } else {
         activity.authorName = 'Desconegut';
@@ -290,8 +319,82 @@ export class ActivitiesComponent implements OnInit {
 
   verDetallesActividad(activity: any): void {
     console.log('Ver detalles de actividad:', activity);
-    this.selectedActivity = { ...activity }; // Crear una copia per no modificar la original
-    this.showViewModal = true;
+    
+    // Si la actividad tiene un ID válido, intentar cargar desde el servidor con detalles del autor
+    if (activity._id) {
+      this.loading = true;
+      
+      // Primero guardamos los datos básicos que ya tenemos
+      this.selectedActivity = { ...activity };
+      
+      // Si ya tenemos la información del autor en formato objeto, extraer directamente el nombre
+      if (this.selectedActivity.author && typeof this.selectedActivity.author === 'object') {
+        if (this.selectedActivity.author.username) {
+          this.selectedActivity.authorName = this.selectedActivity.author.username;
+        }
+      }
+      
+      this.showViewModal = true;
+      
+      // Después intentamos obtener datos más completos del servidor
+      this.activityService.getActivityById(activity._id).subscribe({
+        next: (detailedActivity) => {
+          console.log('Datos detallados de actividad:', detailedActivity);
+          
+          // Crear una copia para no perder los datos que ya tenemos
+          const updatedActivity = { ...this.selectedActivity };
+          
+          // Actualizar con los nuevos datos manteniendo el nombre del autor si lo tenemos
+          Object.assign(updatedActivity, detailedActivity);
+          
+          // Manejar específicamente el campo author que puede ser un objeto o un string
+          if (detailedActivity.author) {
+            if (typeof detailedActivity.author === 'object') {
+              // Si el autor es un objeto, extraer el nombre de usuario
+              if (detailedActivity.author.username) {
+                updatedActivity.authorName = detailedActivity.author.username;
+              }
+              // Guardamos la referencia al autor pero de forma limpia
+              updatedActivity.authorId = detailedActivity.author._id;
+            } else if (typeof detailedActivity.author === 'string') {
+              // Si es un string, es el ID del autor, cargamos el usuario
+              updatedActivity.authorId = detailedActivity.author;
+              
+              this.userService.getUserById(detailedActivity.author).subscribe({
+                next: (user) => {
+                  if (user && user.username) {
+                    updatedActivity.authorName = user.username;
+                    this.selectedActivity = updatedActivity;
+                  }
+                },
+                error: () => {
+                  // Mantener lo que ya teníamos
+                }
+              });
+            }
+          }
+          
+          // Actualizar el estado con los datos procesados
+          this.selectedActivity = updatedActivity;
+          this.loading = false;
+        },
+        error: (error) => {
+          console.error('Error al cargar detalles de la actividad:', error);
+          // Mantenemos los datos que ya teníamos
+          this.loading = false;
+        }
+      });
+    } else {
+      // Si no hay ID, simplemente mostrar los datos que ya tenemos
+      this.selectedActivity = { ...activity };
+      // Procesar el autor si es un objeto
+      if (this.selectedActivity.author && typeof this.selectedActivity.author === 'object') {
+        if (this.selectedActivity.author.username) {
+          this.selectedActivity.authorName = this.selectedActivity.author.username;
+        }
+      }
+      this.showViewModal = true;
+    }
   }
 
   onActivityCreated(success: boolean): void {
@@ -326,6 +429,11 @@ export class ActivitiesComponent implements OnInit {
   closeViewModal(): void {
     this.showViewModal = false;
     this.selectedActivity = null;
+    
+    // Si se hicieron cambios durante la visualización, actualizar la lista
+    if (this.activitiesListed) {
+      this.obtenerActividades();
+    }
   }
 
   formatDuration(minutes: number): string {
