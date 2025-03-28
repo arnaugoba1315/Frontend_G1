@@ -5,6 +5,7 @@ import { UserService } from '../services/user.service';
 import { MatDialog } from '@angular/material/dialog';
 import { ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog.component';
 import { UserCreateComponent } from '../components/user-create/user-create.component';
+import { ActivitiesComponent } from '../backoffice-activity/backoffice-activity.component';
 import { User } from '../models/user.model';
 
 @Component({
@@ -12,7 +13,7 @@ import { User } from '../models/user.model';
   templateUrl: './backoffice.component.html',
   styleUrls: ['./backoffice.component.css'],
   standalone: true,
-  imports: [CommonModule, FormsModule, UserCreateComponent]
+  imports: [CommonModule, FormsModule, UserCreateComponent, ActivitiesComponent]
 })
 export class BackOfficeComponent implements OnInit {
   users: User[] = [];
@@ -29,7 +30,10 @@ export class BackOfficeComponent implements OnInit {
   showViewModal = false;
   selectedUser: User | null = null;
   
-  // Datos de ejemplo para simulación
+  // Nova propietat per controlar la pestanya activa
+  activeTab: string = 'users';
+  
+  // Dades d'exemple
   allMockUsers: User[] = [
     { _id: '1', username: 'Usuario1', email: 'usuario1@example.com', level: 1, bio: 'Bio de usuario 1', profilePicture: '', visible: true, visibility: true },
     { _id: '2', username: 'Usuario2', email: 'usuario2@example.com', level: 2, bio: 'Bio de usuario 2', profilePicture: '', visible: true, visibility: true },
@@ -47,6 +51,17 @@ export class BackOfficeComponent implements OnInit {
   ngOnInit(): void {
     // Para cargar automáticamente los usuarios al iniciar la aplicación, descomenta la siguiente línea:
     // this.obtenerUsuarios();
+  }
+
+  // Mètode per canviar entre pestanyes (Users/Activities)
+  setActiveTab(tab: string): void {
+    this.activeTab = tab;
+    
+    // Si canviem a la pestanya d'usuaris i encara no s'han carregat, poder carregar-los
+    if (tab === 'users' && !this.usuariosListados) {
+      // Opcional: cargar automáticamente la lista de usuarios al cambiar a esa pestaña
+      // this.obtenerUsuarios();
+    }
   }
 
   obtenerUsuarios(): void {

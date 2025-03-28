@@ -6,13 +6,14 @@ import { MatDialog } from '@angular/material/dialog';
 import { ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog.component';
 import { UserCreateComponent } from '../components/user-create/user-create.component';
 import { User } from '../models/user.model';
+import { ActivitiesComponent } from '../backoffice-activity/backoffice-activity.component';
 
 @Component({
   selector: 'app-backoffice',
   templateUrl: './backoffice.component.html',
   styleUrls: ['./backoffice.component.css'],
   standalone: true,
-  imports: [CommonModule, FormsModule, UserCreateComponent]
+  imports: [CommonModule, FormsModule, UserCreateComponent, ActivitiesComponent]
 })
 export class BackOfficeComponent implements OnInit {
   users: User[] = [];
@@ -28,6 +29,7 @@ export class BackOfficeComponent implements OnInit {
   showEditModal = false;
   showViewModal = false;
   selectedUser: User | null = null;
+  activeTab: string = 'users';
   
   // Datos de ejemplo completos
   allMockUsers: User[] = [
@@ -52,6 +54,10 @@ export class BackOfficeComponent implements OnInit {
 
   ngOnInit(): void {
     // No cargamos usuarios automáticamente
+  }
+
+  setActiveTab(tab: string): void {
+    this.activeTab = tab;
   }
 
   obtenerUsuarios(): void {
