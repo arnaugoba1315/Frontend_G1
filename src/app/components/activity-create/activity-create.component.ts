@@ -35,6 +35,7 @@ export class ActivityCreateComponent implements OnInit {
       elevationGain: [0, [Validators.required, Validators.min(0)]],
       averageSpeed: [0, [Validators.required, Validators.min(0)]],
       caloriesBurned: [null],
+      // Inicializamos route y musicPlaylist como arrays vacíos
       route: [[]],
       musicPlaylist: [[]]
     });
@@ -47,7 +48,7 @@ export class ActivityCreateComponent implements OnInit {
   loadUsers(): void {
     this.loading = true;
     
-    this.userService.getUsers(1, 100, true) // Obtenir fins a 100 usuaris, inclosos els ocults
+    this.userService.getUsers(1, 100, true)
       .subscribe({
         next: (response) => {
           this.loading = false;
@@ -70,6 +71,7 @@ export class ActivityCreateComponent implements OnInit {
   
   onSubmit(): void {
     if (this.activityForm.invalid) {
+      this.activityForm.markAllAsTouched();
       return;
     }
     
@@ -78,28 +80,35 @@ export class ActivityCreateComponent implements OnInit {
     
     const formData = this.activityForm.value;
     
-    // Format correcte de les dades
-    if (typeof formData.startTime === 'string') {
-      formData.startTime = new Date(formData.startTime);
-    }
-    if (typeof formData.endTime === 'string') {
-      formData.endTime = new Date(formData.endTime);
-    }
+    // Crear estructura de datos correcta para el backend
+    const requestData = {
+      // Incluimos userId como espera el backend
+      userId: formData.author,
+      
+      // También incluimos user para satisfacer la validación
+      user: formData.author,
+      
+      // Incluimos author como está en el modelo
+      author: formData.author,
+      
+      name: formData.name,
+      type: formData.type,
+      startTime: new Date(formData.startTime),
+      endTime: new Date(formData.endTime),
+      duration: Number(formData.duration),
+      distance: Number(formData.distance),
+      elevationGain: Number(formData.elevationGain),
+      averageSpeed: Number(formData.averageSpeed),
+      caloriesBurned: formData.caloriesBurned ? Number(formData.caloriesBurned) : undefined,
+      
+      // Aseguramos que route y musicPlaylist sean arrays vacíos para evitar el error de validación
+      route: [],
+      musicPlaylist: []
+    };
     
-    // Per calcular la duració de l'activitat si no es fa manualment (en minuts)
-    if (!formData.duration || formData.duration === 0) {
-      const startTime = new Date(formData.startTime);
-      const endTime = new Date(formData.endTime);
-      formData.duration = Math.round((endTime.getTime() - startTime.getTime()) / 60000);
-    }
+    console.log('Enviando datos de actividad:', requestData);
     
-    // Assegurar que els arrays estiguin inicialitzats
-    if (!formData.route) formData.route = [];
-    if (!formData.musicPlaylist) formData.musicPlaylist = [];
-    
-    console.log('Enviando datos de actividad:', formData);
-    
-    this.activityService.createActivity(formData).subscribe({
+    this.activityService.createActivity(requestData).subscribe({
       next: (response) => {
         console.log('Actividad creada:', response);
         this.loading = false;
@@ -108,8 +117,14 @@ export class ActivityCreateComponent implements OnInit {
       },
       error: (error) => {
         this.loading = false;
-        this.error = error.message || 'Error al crear la actividad';
         console.error('Error al crear actividad:', error);
+        
+        // Mostrar mensaje de error más detallado si está disponible
+        if (error.error && error.error.message) {
+          this.error = error.error.message;
+        } else {
+          this.error = error.message || 'Error al crear la actividad';
+        }
       }
     });
   }
@@ -128,11 +143,6 @@ export class ActivityCreateComponent implements OnInit {
   
   cancel(): void {
     this.activityCreated.emit(false);
-  }
-  
-  // Un altre mètode per obtenir errors dels camps del formulari
-  get f() { 
-    return this.activityForm.controls; 
   }
   
   hasError(controlName: string, errorType: string) {
