@@ -18,7 +18,7 @@ export class UserService {
       .set('limit', limit.toString());
     
     if (includeHidden) {
-      params = params.set('includeInvisible', 'true');
+      params = params.set('includeInvisible', 'false');
     }
     
     return this.http.get<any>(this.apiUrl, { params });

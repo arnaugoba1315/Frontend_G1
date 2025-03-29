@@ -179,7 +179,7 @@ export class BackOfficeComponent implements OnInit {
     });
   }
 
-  eliminarUsuario(user: User): void {
+  eliminarUsuario(user: any): void {
     console.log('Eliminar usuario:', user);
     const dialogRef = this.dialog.open(ConfirmDialogComponent, {
       data: { message: `¿Estás seguro de que deseas eliminar el usuario ${user.username}?` }
