@@ -208,10 +208,6 @@ export class UsersComponent implements OnInit {
   getUserDetails(user: User): void {
     console.log("Veure detalls de l'usuari:", user);
     this.selectedUser = { ...user }; // Crear una copia per no modificar l'usuari
-    this.showViewModal = true;
-    this.showEditModal = false;
-    this.showCreateModal = false;
-
     // Obtenir els detalls de les activitats
     if (this.selectedUser.activities && this.selectedUser.activities.length > 0 && user.activities) {
       this.selectedUser.activities = []; // Inicialitzem l'array de les activitats
@@ -226,7 +222,11 @@ export class UsersComponent implements OnInit {
         });
       });
     }
+    this.showViewModal = true;
+    this.showEditModal = false;
+    this.showCreateModal = false;
   }
+
 
   onUserCreated(success: boolean): void {
     this.showCreateModal = false;
