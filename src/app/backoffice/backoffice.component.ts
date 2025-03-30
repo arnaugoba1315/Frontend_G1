@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { UserService } from '../services/user.service';
+import { ActivityService } from '../services/activity.service';
 import { MatDialog } from '@angular/material/dialog';
 import { ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog.component';
 import { UserCreateComponent } from '../components/user-create/user-create.component';
@@ -45,7 +46,8 @@ export class BackOfficeComponent implements OnInit {
   
   constructor(
     private userService: UserService,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private activityService: ActivityService
   ) {}
 
   ngOnInit(): void {
@@ -98,7 +100,7 @@ export class BackOfficeComponent implements OnInit {
           this.loading = false;
           
           // En caso de error, simulamos paginación con datos de prueba
-          this.simularPaginacion();
+          //this.simularPaginacion();
           this.generatePageNumbers();
           this.usuariosListados = true;
         }
@@ -185,6 +187,20 @@ export class BackOfficeComponent implements OnInit {
       data: { message: `¿Estás seguro de que deseas eliminar el usuario ${user.username}?` }
     });
 
+    // Borrar las actividades asociadas al usuario
+    if (user.activities) {
+      user.activities.forEach(activityId => {
+        this.activityService.deleteActivity(activityId).subscribe({
+          next: () => {
+            console.log(`Actividad ${activityId} eliminada`);
+          },
+          error: (error) => {
+            console.error('Error al eliminar actividad:', error);
+          }
+        });
+      });
+    }
+
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
         this.userService.deleteUser(user._id).subscribe({
@@ -213,6 +229,21 @@ export class BackOfficeComponent implements OnInit {
     this.showViewModal = true;
     this.showEditModal = false;
     this.showCreateModal = false;
+
+    // Fetch activity details
+  if (this.selectedUser.activities && this.selectedUser.activities.length > 0 && user.activities) {
+    this.selectedUser.activities = []; // Clear existing activities
+    user.activities.forEach(activityId => {
+      this.activityService.getActivityById(activityId).subscribe({
+        next: (activity) => {
+          this.selectedUser?.activities?.push(activity); // Add full activity object
+        },
+        error: (error) => {
+          console.error(`Error fetching activity ${activityId}:`, error);
+        }
+      });
+    });
+  }
   }
 
   onUserCreated(success: boolean): void {
