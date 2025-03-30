@@ -10,6 +10,7 @@
   display: flex;
   justify-content: flex-end;
   margin-bottom: 20px;
+  gap: 10px;
 }
 
 .btn-create {
@@ -33,14 +34,9 @@
   margin-right: 8px;
 }
 
-/* Estil pels botons de llistar */
-.button-container {
+.btn-refresh-users {
   display: flex;
-  justify-content: center;
-  margin: 40px 0;
-}
-
-.btn-load {
+  align-items: center;
   background-color: #3f51b5;
   color: white;
   border: none;
@@ -48,12 +44,15 @@
   border-radius: 4px;
   font-weight: bold;
   cursor: pointer;
-  font-size: 16px;
   transition: background-color 0.3s;
 }
 
-.btn-load:hover {
+.btn-refresh-users:hover {
   background-color: #303f9f;
+}
+
+.btn-refresh-users i {
+  margin-right: 8px;
 }
 
 /* Estils per la quadrícula d'usuaris */

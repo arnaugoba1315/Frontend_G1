@@ -35,7 +35,7 @@ export class ActivityCreateComponent implements OnInit {
       elevationGain: [0, [Validators.required, Validators.min(0)]],
       averageSpeed: [0, [Validators.required, Validators.min(0)]],
       caloriesBurned: [null],
-      // Inicializamos route y musicPlaylist como arrays vacíos
+      // Inicialiaitzem route i musicPlaylist como arrays buits
       route: [[]],
       musicPlaylist: [[]]
     });
@@ -55,16 +55,16 @@ export class ActivityCreateComponent implements OnInit {
           
           if (response && response.users && response.users.length > 0) {
             this.users = response.users;
-            console.log('Usuarios cargados:', this.users);
+            console.log('Usuaris carregats:', this.users);
           } else {
-            console.warn('No se encontraron usuarios en la base de datos');
-            this.error = 'No se encontraron usuarios para asignar como autores';
+            console.warn("No s'han trobat usuaris en la base de dades");
+            this.error = "No s'han trobat usuaris per assignar com autors";
           }
         },
         error: (err) => {
           this.loading = false;
-          console.error('Error cargando usuarios:', err);
-          this.error = 'Error al cargar la lista de usuarios';
+          console.error('Error carregant usuaris:', err);
+          this.error = "Error al carregar la llista d'usuaris";
         }
       });
   }
@@ -80,15 +80,15 @@ export class ActivityCreateComponent implements OnInit {
     
     const formData = this.activityForm.value;
     
-    // Crear estructura de datos correcta para el backend
+    // Crear estructura de dades per la base de dades
     const requestData = {
-      // Incluimos userId como espera el backend
+      // Incluim userId com espera al backend
       userId: formData.author,
       
-      // También incluimos user para satisfacer la validación
+      // També incluim user per satisfer la validació
       user: formData.author,
       
-      // Incluimos author como está en el modelo
+      // Al estar en el model, també possem author
       author: formData.author,
       
       name: formData.name,
@@ -101,29 +101,29 @@ export class ActivityCreateComponent implements OnInit {
       averageSpeed: Number(formData.averageSpeed),
       caloriesBurned: formData.caloriesBurned ? Number(formData.caloriesBurned) : undefined,
       
-      // Aseguramos que route y musicPlaylist sean arrays vacíos para evitar el error de validación
+      // Ens assegurem que route i musicPlaylist son arrays buits per evitar error de validació
       route: [],
       musicPlaylist: []
     };
     
-    console.log('Enviando datos de actividad:', requestData);
+    console.log("Enviant dades d'activitat", requestData);
     
     this.activityService.createActivity(requestData).subscribe({
       next: (response) => {
-        console.log('Actividad creada:', response);
+        console.log('Activitat creada:', response);
         this.loading = false;
         this.activityCreated.emit(true);
         this.resetForm();
       },
       error: (error) => {
         this.loading = false;
-        console.error('Error al crear actividad:', error);
+        console.error('Error al crear activitat:', error);
         
-        // Mostrar mensaje de error más detallado si está disponible
+        // Si és possible, s'ensenya el missatge d'error més detallat
         if (error.error && error.error.message) {
           this.error = error.error.message;
         } else {
-          this.error = error.message || 'Error al crear la actividad';
+          this.error = error.message || "Error al crear l'activitat";
         }
       }
     });

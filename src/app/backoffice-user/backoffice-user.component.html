@@ -1,15 +1,11 @@
 <div class="container">
-  <!-- Botó per crear usuari -->
+  <!-- Botons per realitzar accions importants -->
     <div class="action-buttons">
       <button class="btn-create" (click)="showCreateUserForm()">
         <i class="material-icons">add</i> Crear nou usuari
       </button>
-    </div>
-    
-    <!-- Inicialment només mostrar el botó de llistar usuaris -->
-    <div class="button-container" *ngIf="!loadedUsers">
-      <button class="btn-load" (click)="getUsers()">
-        Llistar tots els usuaris
+      <button class="btn-refresh-users" (click)="getUsers()">
+        <i class="material-icons">refresh</i> Actualitzar
       </button>
     </div>
     
@@ -28,7 +24,7 @@
             <h3 class="user-name">{{ user.username }}</h3>
           </div>
           <div class="user-info">
-            <p><strong>Email:</strong> {{ user.email }}</p>
+            <p><strong>Correu electrònic:</strong> {{ user.email }}</p>
             <p><strong>Nivell:</strong> {{ user.level || 'N/A' }}</p>
             <p class="user-bio"><strong>Bio:</strong> {{ user.bio || 'Sense biografia' }}</p>
           </div>
@@ -71,7 +67,7 @@
           class="pagination-btn" 
           [disabled]="currentPage === totalPages"
           (click)="changePage(currentPage + 1)">
-          Siguiente »
+          Següent »
         </button>
       </div>
       

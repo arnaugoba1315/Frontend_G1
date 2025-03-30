@@ -47,9 +47,11 @@ export class UsersComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    this.getUsers();
   }
 
   getUsers(): void {
+    this.loadedUsers = false;
     this.loading = true;
     
     // Obtenir tots els usuaris, incloent els ocults

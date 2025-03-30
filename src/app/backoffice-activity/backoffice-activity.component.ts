@@ -25,7 +25,7 @@ export class ActivitiesComponent implements OnInit {
   pages: number[] = [];
   loading = false;
   error = '';
-  activitiesListed = false;
+  loadedActivities = false;
   showCreateModal = false;
   showEditModal = false;
   showViewModal = false;
@@ -130,13 +130,14 @@ export class ActivitiesComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    // this.getActivities();
+    this.getActivities();
   }
 
   paginatedActivities: any[] = [];
 
   getActivities(): void {
     this.loading = true;
+    this.loadedActivities = false;
     
     this.activityService.getActivities(this.currentPage, this.itemsPerPage)
       .subscribe({
@@ -177,7 +178,7 @@ export class ActivitiesComponent implements OnInit {
           this.generatePageNumbers();
           this.updatePaginatedActivities();
           this.loading = false;
-          this.activitiesListed = true;
+          this.loadedActivities = true;
         },
         error: (err) => {
           console.error('Error al carregar activitats:', err);
@@ -191,7 +192,7 @@ export class ActivitiesComponent implements OnInit {
           this.totalPages = Math.ceil(this.totalActivities / this.itemsPerPage);
           this.generatePageNumbers();
           this.updatePaginatedActivities();
-          this.activitiesListed = true;
+          this.loadedActivities = true;
         }
       });
   }
@@ -430,7 +431,7 @@ export class ActivitiesComponent implements OnInit {
     this.selectedActivity = null;
     
     // Si s'han fet canis durant la visualització, actualitzar la llista
-    if (this.activitiesListed) {
+    if (this.loadedActivities) {
       this.getActivities();
     }
   }

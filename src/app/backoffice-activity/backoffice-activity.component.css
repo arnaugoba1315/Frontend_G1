@@ -10,6 +10,8 @@
   display: flex;
   justify-content: flex-end;
   margin-bottom: 20px;
+  gap: 10px;
+  max-height: 44px;
 }
 
 .btn-create {
@@ -33,14 +35,9 @@
   margin-right: 8px;
 }
 
-/* Estils pel botó de llistar */
-.button-container {
+.btn-refresh-activities {
   display: flex;
-  justify-content: center;
-  margin: 40px 0;
-}
-
-.btn-load {
+  align-items: center;
   background-color: #3f51b5;
   color: white;
   border: none;
@@ -48,12 +45,15 @@
   border-radius: 4px;
   font-weight: bold;
   cursor: pointer;
-  font-size: 16px;
   transition: background-color 0.3s;
 }
 
-.btn-load:hover {
+.btn-refresh-activities:hover {
   background-color: #303f9f;
+}
+
+.btn-refresh-activities i {
+  margin-right: 8px;
 }
 
 /* Estils per la paginació */
@@ -230,7 +230,7 @@ margin-top: 10px;
   opacity: 0.9;
 }
 
-/* Estils addicionals pels filtres*/
+/* Estils addicionals pels filtres */
 .filter-container {
   margin-bottom: 20px;
   padding: 15px;

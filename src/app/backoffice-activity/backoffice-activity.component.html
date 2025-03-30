@@ -4,17 +4,13 @@
     <button class="btn-create" (click)="showCreateActivityForm()">
       <i class="material-icons">add</i> Crear nova activitat
     </button>
-  </div>
-  
-  <!-- Inicialment només mostrar botó d'inicialitzar -->
-  <div class="button-container" *ngIf="!activitiesListed">
-    <button class="btn-load" (click)="getActivities()">
-      Llistar totes les activitats
+    <button class="btn-refresh-activities" (click)="getActivities()">
+      <i class="material-icons">refresh</i> Actualitzar
     </button>
   </div>
   
   <!-- Llista paginada d'activitats -->
-  <div class="activities-container" *ngIf="activitiesListed">
+  <div class="activities-container" *ngIf="loadedActivities">
     <h2>Activitats</h2>
     
     <!-- Filtre per tipus d'activitat -->
