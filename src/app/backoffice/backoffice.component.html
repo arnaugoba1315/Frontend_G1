@@ -162,6 +162,12 @@
         <p><strong>Email:</strong> {{ selectedUser.email }}</p>
         <p><strong>Nivell:</strong> {{ selectedUser.level }}</p>
         <p><strong>Estat:</strong> {{ selectedUser.visible ? 'Visible' : 'Oculto' }}</p>
+        <p><strong>Activitiats:</strong></p>
+        <ul>
+          <li *ngFor="let activity of selectedUser.activities">
+            <strong>{{activity.name}}</strong>
+          </li>
+        </ul>
         <p><strong>Biografia:</strong></p>
         <div class="bio-text">{{ selectedUser.bio || 'Este usuario no tiene biografía.' }}</div>
       </div>
