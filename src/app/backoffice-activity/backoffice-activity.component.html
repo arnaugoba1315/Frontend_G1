@@ -8,7 +8,7 @@
   
   <!-- Inicialment només mostrar botó d'inicialitzar -->
   <div class="button-container" *ngIf="!activitiesListed">
-    <button class="btn-load" (click)="obtenerActividades()">
+    <button class="btn-load" (click)="getActivities()">
       Llistar totes les activitats
     </button>
   </div>
@@ -47,13 +47,13 @@
           <p><strong>Velocitat mitja:</strong> {{ activity.averageSpeed.toFixed(1) }} km/h</p>
         </div>
         <div class="activity-actions">
-          <button class="btn-edit" (click)="editarActividad(activity)">
+          <button class="btn-edit" (click)="updateActivity(activity)">
             <i class="material-icons">edit</i> Editar
           </button>
-          <button class="btn-delete" (click)="eliminarActividad(activity)">
+          <button class="btn-delete" (click)="deleteActivity(activity)">
             <i class="material-icons">delete</i> Eliminar
           </button>
-          <button class="btn-view" (click)="verDetallesActividad(activity)">
+          <button class="btn-view" (click)="getActivityDetails(activity)">
             <i class="material-icons">visibility</i> Detalls
           </button>
         </div>

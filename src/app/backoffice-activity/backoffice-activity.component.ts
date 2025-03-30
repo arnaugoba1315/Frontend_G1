@@ -35,13 +35,13 @@ export class ActivitiesComponent implements OnInit {
   formattedStartTime: string = '';
   formattedEndTime: string = '';
   
-  // dades d'exeemple
+  // Dades d'exemple
   allMockActivities: any[] = [
     { 
       _id: '1', 
-      name: 'Running en el parque', 
+      name: 'Running en el parc', 
       author: '1', 
-      authorName: 'Usuario1',
+      authorName: 'Usuari1',
       startTime: new Date('2025-03-20T08:00:00'), 
       endTime: new Date('2025-03-20T09:00:00'), 
       duration: 60, 
@@ -53,9 +53,9 @@ export class ActivitiesComponent implements OnInit {
     },
     { 
       _id: '2', 
-      name: 'Ciclismo de montaña', 
+      name: 'Ciclisme de muntanya', 
       author: '2', 
-      authorName: 'Usuario2',
+      authorName: 'Usuari2',
       startTime: new Date('2025-03-21T10:00:00'), 
       endTime: new Date('2025-03-21T12:00:00'), 
       duration: 120, 
@@ -67,9 +67,9 @@ export class ActivitiesComponent implements OnInit {
     },
     { 
       _id: '3', 
-      name: 'Caminata al lago', 
+      name: 'Caminata al llac', 
       author: '3', 
-      authorName: 'Usuario3',
+      authorName: 'Usuari3',
       startTime: new Date('2025-03-22T15:00:00'), 
       endTime: new Date('2025-03-22T17:00:00'), 
       duration: 120, 
@@ -83,7 +83,7 @@ export class ActivitiesComponent implements OnInit {
       _id: '4', 
       name: 'Carrera matutina', 
       author: '1', 
-      authorName: 'Usuario1',
+      authorName: 'Usuari1',
       startTime: new Date('2025-03-23T07:00:00'), 
       endTime: new Date('2025-03-23T07:45:00'), 
       duration: 45, 
@@ -95,9 +95,9 @@ export class ActivitiesComponent implements OnInit {
     },
     { 
       _id: '5', 
-      name: 'Paseo por la ciudad', 
+      name: 'Passeig per la ciutat', 
       author: '2', 
-      authorName: 'Usuario2',
+      authorName: 'Usuari2',
       startTime: new Date('2025-03-24T18:00:00'), 
       endTime: new Date('2025-03-24T19:00:00'), 
       duration: 60, 
@@ -111,7 +111,7 @@ export class ActivitiesComponent implements OnInit {
       _id: '6', 
       name: 'Ruta en bicicleta', 
       author: '3', 
-      authorName: 'Usuario3',
+      authorName: 'Usuari3',
       startTime: new Date('2025-03-25T09:00:00'), 
       endTime: new Date('2025-03-25T11:30:00'), 
       duration: 150, 
@@ -130,19 +130,18 @@ export class ActivitiesComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    // Para cargar automáticamente las actividades al iniciar la aplicación:
-    // this.obtenerActividades();
+    // this.getActivities();
   }
 
   paginatedActivities: any[] = [];
 
-  obtenerActividades(): void {
+  getActivities(): void {
     this.loading = true;
     
     this.activityService.getActivities(this.currentPage, this.itemsPerPage)
       .subscribe({
         next: (response) => {
-          console.log('Datos recibidos del servidor:', response);
+          console.log('Dades rebudes del servidor:', response);
           
           if (Array.isArray(response)) {
             this.activities = response;
@@ -153,17 +152,17 @@ export class ActivitiesComponent implements OnInit {
             this.totalActivities = response.totalUsers || response.activities.length;
             this.totalPages = response.totalPages || Math.ceil(this.totalActivities / this.itemsPerPage);
           } else {
-            console.warn('No se recibieron actividades del servidor');
+            console.warn("No s'han rebut activitats del servidor.");
             this.activities = this.allMockActivities.slice(0, this.itemsPerPage);
             this.totalActivities = this.allMockActivities.length;
             this.totalPages = Math.ceil(this.totalActivities / this.itemsPerPage);
           }
           
-          // Preprocesar las actividades para asegurar que el campo author sea una cadena
+          // Pre-processar les activitats per assegurar que el camp author sigui una cadena
           this.activities = this.activities.map(activity => {
-            // Manejar los casos donde el autor puede venir como objeto o como string
+            // Manejar els casos on l'autor pot venir com objeto o com un string
             if (activity.author && typeof activity.author === 'object' && activity.author._id) {
-              // Si el autor viene como objeto, guardamos el ID como string
+              // Si l'autor ve como un objeto, guardem l'ID com un string
               const authorId = activity.author._id;
               const authorName = activity.author.username || 'Desconegut';
               return { ...activity, author: authorId, authorName: authorName };
@@ -171,7 +170,7 @@ export class ActivitiesComponent implements OnInit {
             return activity;
           });
           
-          // Ahora cargar los nombres de los autores para los que solo tenemos ID
+          // Ara carreguem els noms dels autors per als que només tenim l'ID
           this.loadAuthorNames();
           
           this.filteredActivities = [...this.activities];
@@ -181,11 +180,11 @@ export class ActivitiesComponent implements OnInit {
           this.activitiesListed = true;
         },
         error: (err) => {
-          console.error('Error al cargar actividades:', err);
-          this.error = 'Error al cargar actividades';
+          console.error('Error al carregar activitats:', err);
+          this.error = 'Error al carregar activitats';
           this.loading = false;
           
-          // En caso de error, usar datos de ejemplo
+          // En cas d'error, utilitzem les dades d'exemple
           this.activities = this.allMockActivities.slice(0, this.itemsPerPage);
           this.filteredActivities = [...this.activities];
           this.totalActivities = this.allMockActivities.length;
@@ -223,14 +222,14 @@ export class ActivitiesComponent implements OnInit {
     });
   }
 
-  // Métode per simular la paginació amb dades de proba
+  // Mètode per simular la paginació amb dades de proba
   testPagination(): void {
     const startIndex = (this.currentPage - 1) * this.itemsPerPage;
     const endIndex = Math.min(startIndex + this.itemsPerPage, this.allMockActivities.length);
     
     this.activities = this.allMockActivities.slice(startIndex, endIndex);
     this.filteredActivities = [...this.activities];
-    this.updatePaginatedActivities(); // Update paginated activities here
+    this.updatePaginatedActivities();
     
     this.totalActivities = this.allMockActivities.length;
     this.totalPages = Math.ceil(this.totalActivities / this.itemsPerPage);
@@ -266,7 +265,7 @@ export class ActivitiesComponent implements OnInit {
         activity.type === this.selectedType
       );
     }
-    this.currentPage = 1; // Reset to the first page after filtering
+    this.currentPage = 1;
     this.updatePaginatedActivities();
   }
 
@@ -277,9 +276,9 @@ export class ActivitiesComponent implements OnInit {
     this.selectedActivity = null;
   }
 
-  editarActividad(activity: any): void {
-    console.log('Editar actividad:', activity);
-    this.selectedActivity = { ...activity }; // Crear una copia para no modificar la original
+  updateActivity(activity: any): void {
+    console.log('Editar activitat:', activity);
+    this.selectedActivity = { ...activity }; // Crear una còpia per no modificar l'original
     
     this.formattedStartTime = this.formatDateTimeForInput(activity.startTime);
     this.formattedEndTime = this.formatDateTimeForInput(activity.endTime);
@@ -289,10 +288,10 @@ export class ActivitiesComponent implements OnInit {
     this.showViewModal = false;
   }
 
-  eliminarActividad(activity: any): void {
-    console.log('Eliminar actividad:', activity);
+  deleteActivity(activity: any): void {
+    console.log('Eliminar activitat:', activity);
     const dialogRef = this.dialog.open(ConfirmDialogComponent, {
-      data: { message: `¿Estás seguro de que deseas eliminar la actividad "${activity.name}"?` }
+      data: { message: `Estàs segur de que vols eliminar l'activitat "${activity.name}"?` }
     });
 
     dialogRef.afterClosed().subscribe(result => {
@@ -301,33 +300,33 @@ export class ActivitiesComponent implements OnInit {
           next: () => {
             console.log(`Actividad ${activity._id} eliminada`);
             
-            // Eliminar la activitat de les notres dades de prova també
+            // Eliminar l'activitat de les dades de prova
             const index = this.allMockActivities.findIndex(a => a._id === activity._id);
             if (index !== -1) {
               this.allMockActivities.splice(index, 1);
             }
             
-            this.obtenerActividades(); // Recargar la llista després d'eliminar
+            this.getActivities();
           },
           error: (error) => {
-            console.error('Error al eliminar actividad:', error);
+            console.error("Error al eliminar l'activitat:", error);
           }
         });
       }
     });
   }
 
-  verDetallesActividad(activity: any): void {
-    console.log('Ver detalles de actividad:', activity);
+  getActivityDetails(activity: any): void {
+    console.log("Veure detalls de l'activitat:", activity);
     
-    // Si la actividad tiene un ID válido, intentar cargar desde el servidor con detalles del autor
+    // Si l'activitat té un ID vàlid, intentem carregar des del servidor els detalls
     if (activity._id) {
       this.loading = true;
       
-      // Primero guardamos los datos básicos que ya tenemos
+      // Primer guardem les dades bàsiques que ja tenim
       this.selectedActivity = { ...activity };
       
-      // Si ya tenemos la información del autor en formato objeto, extraer directamente el nombre
+      // Si ja tenim l'informació de l'autor en objecte, extreiem directament el nom de l'autor
       if (this.selectedActivity.author && typeof this.selectedActivity.author === 'object') {
         if (this.selectedActivity.author.username) {
           this.selectedActivity.authorName = this.selectedActivity.author.username;
@@ -336,28 +335,28 @@ export class ActivitiesComponent implements OnInit {
       
       this.showViewModal = true;
       
-      // Después intentamos obtener datos más completos del servidor
+      // Després intentem obtenir dades més completes del servidor
       this.activityService.getActivityById(activity._id).subscribe({
         next: (detailedActivity) => {
-          console.log('Datos detallados de actividad:', detailedActivity);
+          console.log("Dades completes de l'activitat:", detailedActivity);
           
-          // Crear una copia para no perder los datos que ya tenemos
+          // Crear una còpia per no perdre les dades que ja tenim
           const updatedActivity = { ...this.selectedActivity };
           
-          // Actualizar con los nuevos datos manteniendo el nombre del autor si lo tenemos
+          // Actualitzar amb les noves dades mantenint el nom de l'autor si ja el tenim
           Object.assign(updatedActivity, detailedActivity);
           
-          // Manejar específicamente el campo author que puede ser un objeto o un string
+          // Manejar específicament el camp author que pot ser un objecte o un string
           if (detailedActivity.author) {
             if (typeof detailedActivity.author === 'object') {
-              // Si el autor es un objeto, extraer el nombre de usuario
+              // Si l'autor és un objecte, extreiem el seu nom d'usuari
               if (detailedActivity.author.username) {
                 updatedActivity.authorName = detailedActivity.author.username;
               }
-              // Guardamos la referencia al autor pero de forma limpia
+              // Guardem la referència a l'autor
               updatedActivity.authorId = detailedActivity.author._id;
             } else if (typeof detailedActivity.author === 'string') {
-              // Si es un string, es el ID del autor, cargamos el usuario
+              // Si és un string, carreguem l'usuari associat a l'ID
               updatedActivity.authorId = detailedActivity.author;
               
               this.userService.getUserById(detailedActivity.author).subscribe({
@@ -368,26 +367,26 @@ export class ActivitiesComponent implements OnInit {
                   }
                 },
                 error: () => {
-                  // Mantener lo que ya teníamos
+                  // Mantenir el que ja teniem
                 }
               });
             }
           }
           
-          // Actualizar el estado con los datos procesados
+          // Actualizar l'estat amb les dades processades
           this.selectedActivity = updatedActivity;
           this.loading = false;
         },
         error: (error) => {
-          console.error('Error al cargar detalles de la actividad:', error);
-          // Mantenemos los datos que ya teníamos
+          console.error("Error al carregar els detalls de l'activitat:", error);
+          // Mantenem les dades que ja teniem
           this.loading = false;
         }
       });
     } else {
-      // Si no hay ID, simplemente mostrar los datos que ya tenemos
+      // Si no hi ha ID, només mostrar les dades que ja tenim
       this.selectedActivity = { ...activity };
-      // Procesar el autor si es un objeto
+      // Processar el autor si és un objecte
       if (this.selectedActivity.author && typeof this.selectedActivity.author === 'object') {
         if (this.selectedActivity.author.username) {
           this.selectedActivity.authorName = this.selectedActivity.author.username;
@@ -400,25 +399,25 @@ export class ActivitiesComponent implements OnInit {
   onActivityCreated(success: boolean): void {
     this.showCreateModal = false;
     if (success) {
-      this.obtenerActividades(); // Recargar la llista després de crear una nova activitat
+      this.getActivities(); // Recargar la llista després de crear una nova activitat
     }
   }
 
   onActivityEdited(success: boolean): void {
     if (success && this.selectedActivity) {
-      // Actualitzar dates desde els camps formatejats
+      // Actualitzar dates des dels camps formatejats
       this.selectedActivity.startTime = new Date(this.formattedStartTime);
       this.selectedActivity.endTime = new Date(this.formattedEndTime);
       
-      // Actualitzar la activitat en el backend
+      // Actualitzar l'activitat en la base de dades
       this.activityService.updateActivity(this.selectedActivity._id, this.selectedActivity).subscribe({
         next: () => {
-          console.log(`Actividad ${this.selectedActivity?._id} actualizada correctamente`);
+          console.log(`Activitat ${this.selectedActivity?._id} actualitzada correctament`);
           this.showEditModal = false;
-          this.obtenerActividades(); // Recargar la llista
+          this.getActivities();
         },
         error: (error) => {
-          console.error('Error al actualizar actividad:', error);
+          console.error("Error a l'actualizar l'activitat:", error);
         }
       });
     } else {
@@ -430,9 +429,9 @@ export class ActivitiesComponent implements OnInit {
     this.showViewModal = false;
     this.selectedActivity = null;
     
-    // Si se hicieron cambios durante la visualización, actualizar la lista
+    // Si s'han fet canis durant la visualització, actualitzar la llista
     if (this.activitiesListed) {
-      this.obtenerActividades();
+      this.getActivities();
     }
   }
 
