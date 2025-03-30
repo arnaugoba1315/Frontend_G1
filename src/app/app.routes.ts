@@ -6,5 +6,5 @@ import { ActivitiesComponent } from './backoffice-activity/backoffice-activity.c
 export const routes: Routes = [
     { path: 'admin', component: BackOfficeComponent },
     { path: 'activities', component: ActivitiesComponent },
-    { path: '', redirectTo: '/admin', pathMatch: 'full' }
+    //{ path: '', redirectTo: '/admin', pathMatch: 'full' }
 ];

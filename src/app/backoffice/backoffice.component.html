@@ -11,7 +11,7 @@
   
   <!-- Visible secció d'usuaris (quan activeTab === 'users') -->
   <div *ngIf="activeTab === 'users'">
-    <!-- Botón para crear usuario -->
+    <!-- Botó per crear usuari -->
     <div class="action-buttons">
       <button class="btn-create" (click)="showCreateUserForm()">
         <i class="material-icons">add</i> Crear nou usuari
@@ -19,15 +19,15 @@
     </div>
     
     <!-- Inicialment només mostrar el botó de llistar usuaris -->
-    <div class="button-container" *ngIf="!usuariosListados">
-      <button class="btn-listar" (click)="obtenerUsuarios()">
+    <div class="button-container" *ngIf="!loadedUsers">
+      <button class="btn-load" (click)="getUsers()">
         Llistar tots els usuaris
       </button>
     </div>
     
-    <!-- Lista paginada de usuarios (visible solo después de hacer clic en el botón) -->
-    <div class="users-container" *ngIf="usuariosListados">
-      <!-- Tabla de usuarios -->
+    <!-- Llista paginada d'usuaris -->
+    <div class="users-container" *ngIf="loadedUsers">
+      <!-- Taula d'usuaris -->
       <div class="users-grid">
         <div *ngFor="let user of users; trackBy: trackByUserId" 
              class="user-card"
@@ -42,28 +42,28 @@
           <div class="user-info">
             <p><strong>Email:</strong> {{ user.email }}</p>
             <p><strong>Nivell:</strong> {{ user.level || 'N/A' }}</p>
-            <p class="user-bio"><strong>Bio:</strong> {{ user.bio || 'Sin biografía' }}</p>
+            <p class="user-bio"><strong>Bio:</strong> {{ user.bio || 'Sense biografia' }}</p>
           </div>
           <div class="user-actions">
-            <button class="btn-edit" (click)="editarUsuario(user)">
+            <button class="btn-edit" (click)="updateUser(user)">
               <i class="material-icons">edit</i> Editar
             </button>
-            <button class="btn-hide" (click)="marcarUsuarioInvisible(user)">
+            <button class="btn-hide" (click)="updateUserVisibility(user)">
               <i class="material-icons">{{ user.visible ? 'visibility_off' : 'visibility' }}</i> 
               {{ user.visible ? 'Ocultar' : 'Mostrar' }}
               <span *ngIf="!user.visible" class="status-badge">(Oculto)</span>
             </button>
-            <button class="btn-delete" (click)="eliminarUsuario(user)">
+            <button class="btn-delete" (click)="deleteUser(user)">
               <i class="material-icons">delete</i> Eliminar
             </button>
-            <button class="btn-view" (click)="verDetallesUsuario(user)">
+            <button class="btn-view" (click)="getUserDetails(user)">
               <i class="material-icons">visibility</i> Detalls
             </button>
           </div>
         </div>
       </div>
       
-      <!-- Paginación -->
+      <!-- Paginació -->
       <div class="pagination-controls">
         <button 
           class="pagination-btn" 
@@ -88,8 +88,8 @@
       </div>
       
       <div class="pagination-info">
-        Mostrando página {{ currentPage }} de {{ totalPages }} 
-        ({{ totalUsers }} usuarios en total)
+        Mostrant pàgina {{ currentPage }} de {{ totalPages }} 
+        ({{ totalUsers }} usuaris en total)
       </div>
     </div>
   </div>
@@ -99,15 +99,15 @@
     <app-activities></app-activities>
   </div>
 
-  <!-- Modal para crear usuario -->
+  <!-- Modal per crear usuaris -->
   <div class="full-screen-form" *ngIf="showCreateModal">
     <app-user-create (userCreated)="onUserCreated($event)"></app-user-create>
   </div>
 
-  <!-- Modal para editar usuario -->
+  <!-- Modal per editar usuaris -->
   <div class="full-screen-form" *ngIf="showEditModal && selectedUser">
     <div class="modal-header">
-      <h2>Editar Usuario: {{ selectedUser.username }}</h2>
+      <h2>Editar usuari: {{ selectedUser.username }}</h2>
       <button class="close-btn" (click)="showEditModal = false">×</button>
     </div>
     <div class="modal-body">
@@ -118,7 +118,7 @@
         </div>
         
         <div class="form-group">
-          <label for="edit-email">Email</label>
+          <label for="edit-email">Correu electrònic</label>
           <input type="email" id="edit-email" [(ngModel)]="selectedUser.email" name="email" class="form-control">
         </div>
         
@@ -133,7 +133,7 @@
         </div>
         
         <div class="form-group">
-          <label for="edit-profilePicture">URL de imatge de perfil</label>
+          <label for="edit-profilePicture">URL d'imatge de perfil</label>
           <input type="text" id="edit-profilePicture" [(ngModel)]="selectedUser.profilePicture" name="profilePicture" class="form-control">
         </div>
         
@@ -145,10 +145,10 @@
     </div>
   </div>
 
-  <!-- Modal para ver detalles de usuario -->
+  <!-- Modal para veure els detalls d'usuari -->
   <div class="full-screen-form view-details" *ngIf="showViewModal && selectedUser">
     <div class="modal-header">
-      <h2>Detalls de l'Usuari</h2>
+      <h2>Detalls de l'usuari</h2>
       <button class="close-btn" (click)="closeViewModal()">×</button>
     </div>
     <div class="modal-body user-details">
@@ -159,17 +159,17 @@
       
       <div class="user-details-info">
         <p><strong>ID:</strong> {{ selectedUser._id }}</p>
-        <p><strong>Email:</strong> {{ selectedUser.email }}</p>
+        <p><strong>Correu electrònic:</strong> {{ selectedUser.email }}</p>
         <p><strong>Nivell:</strong> {{ selectedUser.level }}</p>
-        <p><strong>Estat:</strong> {{ selectedUser.visible ? 'Visible' : 'Oculto' }}</p>
-        <p><strong>Activitiats:</strong></p>
+        <p><strong>Estat:</strong> {{ selectedUser.visible ? 'Visible' : 'Ocult' }}</p>
+        <p><strong>Activitats:</strong></p>
         <ul>
           <li *ngFor="let activity of selectedUser.activities">
             <strong>{{activity.name}}</strong>
           </li>
         </ul>
         <p><strong>Biografia:</strong></p>
-        <div class="bio-text">{{ selectedUser.bio || 'Este usuario no tiene biografía.' }}</div>
+        <div class="bio-text">{{ selectedUser.bio || 'Aquest usuari no té biografia.' }}</div>
       </div>
       
       <div class="form-actions">

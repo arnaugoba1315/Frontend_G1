@@ -29,23 +29,23 @@ export class ActivityService {
     return this.http.get<any>(`${this.apiUrl}/${id}`);
   }
   
-  // Método para obtener detalles de actividad con el autor incluido (usando populate)
+  // Mètode per obtenir detalles d'actividad amb l'autor inclós
   getActivityWithAuthorDetails(id: string): Observable<any> {
     const url = `${this.apiUrl}/${id}?populate=author`;
     return this.http.get<any>(url);
   }
   
-  // Crear una nova
+  // Crear una nova activitat
   createActivity(activityData: any): Observable<any> {
     return this.http.post(this.apiUrl, activityData);
   }
 
-  // Actualizar
+  // Actualitzar una activitat
   updateActivity(activityId: string, activityData: any): Observable<any> {
     return this.http.put(`${this.apiUrl}/${activityId}`, activityData);
   }
 
-  // Eliminar
+  // Eliminar una activitat
   deleteActivity(activityId: string): Observable<any> {
     return this.http.delete(`${this.apiUrl}/${activityId}`);
   }

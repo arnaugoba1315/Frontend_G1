@@ -224,7 +224,7 @@ export class ActivitiesComponent implements OnInit {
   }
 
   // Métode per simular la paginació amb dades de proba
-  simularPaginacion(): void {
+  testPagination(): void {
     const startIndex = (this.currentPage - 1) * this.itemsPerPage;
     const endIndex = Math.min(startIndex + this.itemsPerPage, this.allMockActivities.length);
     

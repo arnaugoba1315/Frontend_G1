@@ -5,7 +5,7 @@
   font-family: Arial, sans-serif;
 }
 
-/* Estilos para los botones de acción */
+/* Estil pels botons d'acció */
 .action-buttons {
   display: flex;
   justify-content: flex-end;
@@ -33,14 +33,14 @@
   margin-right: 8px;
 }
 
-/* Estilos para el botón de listar */
+/* Estil pels botons de llistar */
 .button-container {
   display: flex;
   justify-content: center;
   margin: 40px 0;
 }
 
-.btn-listar {
+.btn-load {
   background-color: #3f51b5;
   color: white;
   border: none;
@@ -52,11 +52,11 @@
   transition: background-color 0.3s;
 }
 
-.btn-listar:hover {
+.btn-load:hover {
   background-color: #303f9f;
 }
 
-/* Estilos para la cuadrícula de usuarios */
+/* Estils per la quadrícula d'usuaris */
 .users-container {
   margin-top: 30px;
 }
@@ -77,8 +77,8 @@
 }
 
 .user-card.hidden {
-  background-color: #f0f0f0; /* Cambia el color de fondo */
-  opacity: 0.6; /* Reduce la opacidad */
+  background-color: #f0f0f0; /* Canvia el color de fons */
+  opacity: 0.6; /* Redueïx l'opacitat */
 }
 
 .user-card:hover {
@@ -174,7 +174,7 @@
   opacity: 0.9;
 }
 
-/* Estilos para la paginación */
+/* Estils per la paginació */
 .pagination-controls {
   display: flex;
   justify-content: center;
@@ -226,7 +226,7 @@
   margin-top: 10px;
 }
 
-/* Estilos para el formulario a pantalla completa */
+/* Estils pel formulari a pantalla completa */
 .full-screen-form {
   position: fixed;
   top: 0;

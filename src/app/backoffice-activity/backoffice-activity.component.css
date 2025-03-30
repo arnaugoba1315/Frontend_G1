@@ -5,7 +5,7 @@
   font-family: Arial, sans-serif;
 }
 
-/* Estilos para los botones de acción */
+/* Estils pels botons d'acció */
 .action-buttons {
   display: flex;
   justify-content: flex-end;
@@ -33,14 +33,14 @@
   margin-right: 8px;
 }
 
-/* Estilos para el botón de listar */
+/* Estils pel botó de llistar */
 .button-container {
   display: flex;
   justify-content: center;
   margin: 40px 0;
 }
 
-.btn-listar {
+.btn-load {
   background-color: #3f51b5;
   color: white;
   border: none;
@@ -52,11 +52,11 @@
   transition: background-color 0.3s;
 }
 
-.btn-listar:hover {
+.btn-load:hover {
   background-color: #303f9f;
 }
 
-/* Estilos para la paginación */
+/* Estils per la paginació */
 .pagination-controls {
 display: flex;
 justify-content: center;
@@ -108,7 +108,7 @@ font-size: 14px;
 margin-top: 10px;
 }
 
-/* Estilos para la cuadrícula de actividades */
+/* Estils per la quadrícula d'usuaris */
 .activities-container {
   margin-top: 30px;
 }
@@ -230,7 +230,7 @@ margin-top: 10px;
   opacity: 0.9;
 }
 
-/* Estilos adicionales para el filtro */
+/* Estils addicionals pels filtres*/
 .filter-container {
   margin-bottom: 20px;
   padding: 15px;
@@ -278,7 +278,7 @@ margin-top: 10px;
   margin-bottom: 20px;
 }
 
-/* Estilos para el modal de detalles */
+/* Estils pel modal de detalls de l'activitat */
 .full-screen-form {
 position: fixed;
 top: 0;
@@ -404,7 +404,7 @@ transition: background-color 0.3s;
 background-color: #e0e0e0;
 }
 
-/* Estilos para las insignias de tipo de actividad */
+/* Estils per les insignies del tipus d'activitat */
 .activity-type-badge {
 padding: 5px 10px;
 border-radius: 15px;
@@ -446,7 +446,7 @@ margin-right: 0.5rem;
 to { transform: rotate(360deg); }
 }
 
-/* Estilos para el indicador de carga */
+/* Estils per l'indicador de càrrega */
 .loading-indicator {
 display: flex;
 flex-direction: column;
@@ -473,7 +473,7 @@ margin-bottom: 10px;
 100% { transform: rotate(360deg); }
 }
 
-/* Estilos para el formulario de edición con mejor responsividad */
+/* Estils pel formulari d'edició */
 .edit-modal {
 background-color: #f5f5f5;
 border-radius: 8px;
@@ -576,7 +576,7 @@ background-color: #e53935;
 background-color: #43a047;
 }
 
-/* Media queries para diferentes tamaños de pantalla */
+/* Media queries per diferents tipus de pantalles */
 @media (max-width: 576px) {
 .edit-modal, .modal-content {
   max-width: 100%;

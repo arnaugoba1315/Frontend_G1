@@ -25,7 +25,7 @@ export class BackOfficeComponent implements OnInit {
   pages: number[] = [];
   loading = false;
   error = '';
-  usuariosListados = false;
+  loadedUsers = false;
   showCreateModal = false;
   showEditModal = false;
   showViewModal = false;
@@ -36,12 +36,12 @@ export class BackOfficeComponent implements OnInit {
   
   // Dades d'exemple
   allMockUsers: User[] = [
-    { _id: '1', username: 'Usuario1', email: 'usuario1@example.com', level: 1, bio: 'Bio de usuario 1', profilePicture: '', visible: true, visibility: true },
-    { _id: '2', username: 'Usuario2', email: 'usuario2@example.com', level: 2, bio: 'Bio de usuario 2', profilePicture: '', visible: true, visibility: true },
-    { _id: '3', username: 'Usuario3', email: 'usuario3@example.com', level: 3, bio: 'Bio de usuario 3', profilePicture: '', visible: false, visibility: false },
-    { _id: '4', username: 'Usuario4', email: 'usuario4@example.com', level: 1, bio: 'Bio de usuario 4', profilePicture: '', visible: true, visibility: true },
-    { _id: '5', username: 'Usuario5', email: 'usuario5@example.com', level: 2, bio: 'Bio de usuario 5', profilePicture: '', visible: false, visibility: false },
-    { _id: '6', username: 'Usuario6', email: 'usuario6@example.com', level: 3, bio: 'Bio de usuario 6', profilePicture: '', visible: true, visibility: true },
+    { _id: '1', username: 'Usuari1', email: 'usuari1@example.com', level: 1, bio: "Bio d'usuari 1", profilePicture: '', visible: true, visibility: true },
+    { _id: '2', username: 'Usuari2', email: 'usuari2@example.com', level: 2, bio: "Bio d'usuari 2", profilePicture: '', visible: true, visibility: true },
+    { _id: '3', username: 'Usuari3', email: 'usuari3@example.com', level: 3, bio: "Bio d'usuari 3", profilePicture: '', visible: false, visibility: false },
+    { _id: '4', username: 'Usuari4', email: 'usuari4@example.com', level: 1, bio: "Bio d'usuari 4", profilePicture: '', visible: true, visibility: true },
+    { _id: '5', username: 'Usuari5', email: 'usuari5@example.com', level: 2, bio: "Bio d'usuari 5", profilePicture: '', visible: false, visibility: false },
+    { _id: '6', username: 'Usuari6', email: 'usuari6@example.com', level: 3, bio: "Bio d'usuari 1", profilePicture: '', visible: true, visibility: true },
   ];
   
   constructor(
@@ -51,30 +51,26 @@ export class BackOfficeComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    // Para cargar automáticamente los usuarios al iniciar la aplicación, descomenta la siguiente línea:
-    // this.obtenerUsuarios();
   }
 
-  // Mètode per canviar entre pestanyes (Users/Activities)
+  // Mètode per canviar entre pestanyes
   setActiveTab(tab: string): void {
     this.activeTab = tab;
     
     // Si canviem a la pestanya d'usuaris i encara no s'han carregat, poder carregar-los
-    if (tab === 'users' && !this.usuariosListados) {
-      // Opcional: cargar automáticamente la lista de usuarios al cambiar a esa pestaña
-      // this.obtenerUsuarios();
+    if (tab === 'users' && !this.loadedUsers) {
     }
   }
 
-  obtenerUsuarios(): void {
+  getUsers(): void {
     this.loading = true;
     
     // Obtenir tots els usuaris, incloent els ocults
     this.userService.getUsers(this.currentPage, this.itemsPerPage, true)
       .subscribe({
         next: (response) => {
-          console.log('Respuesta del servidor:', response); // Log para depuración
-          console.log('Usuarios recibidos:', response.users);
+          console.log('Resposta del servidor:', response);
+          console.log('Usuaris rebuts:', response.users);
           
           if (response.users && response.users.length > 0) {
             this.users = response.users.map((user: User) => ({
@@ -82,43 +78,42 @@ export class BackOfficeComponent implements OnInit {
               // Utilitzar qualsevol de les dues propietats, prioritzant visibility (del backend)
               visible: user.visibility !== undefined ? user.visibility : (user.visible !== undefined ? user.visible : true)
             }));
-            console.log('Usuarios procesados:', this.users); // Log para depuración
+            console.log('Usuaris processats:', this.users);
             this.totalUsers = response.totalUsers;
             this.totalPages = response.totalPages;
           } else {
-            console.log('No se encontraron usuarios, usando datos de simulación'); // Log para depuración
-            // Simulación de paginación con datos de prueba
-            this.simularPaginacion();
+            console.log("No s'han trobat usuaris, utilitzant dades de simulació.");
+            this.testPagination();
           }
           this.generatePageNumbers();
           this.loading = false;
-          this.usuariosListados = true;
+          this.loadedUsers = true;
         },
         error: (err) => {
-          console.error('Error al cargar usuarios:', err);
-          this.error = 'Error al cargar usuarios';
+          console.error('Error al carregar usuaris:', err);
+          this.error = 'Error al carregar usuaris';
           this.loading = false;
           
-          // En caso de error, simulamos paginación con datos de prueba
-          //this.simularPaginacion();
+          // En cas d'error, treballem amb les dades de simulació
+          //this.testPagination();
           this.generatePageNumbers();
-          this.usuariosListados = true;
+          this.loadedUsers = true;
         }
       });
   }
 
-  // Método para simular la paginación con datos de prueba
-  simularPaginacion(): void {
+  // Mètode per simular la paginació amb dades de prova
+  testPagination(): void {
     const startIndex = (this.currentPage - 1) * this.itemsPerPage;
     const endIndex = Math.min(startIndex + this.itemsPerPage, this.allMockUsers.length);
     
-    // Obtener los usuarios de la página actual
+    // Obtenir els usuaris de la pàgina actual
     this.users = this.allMockUsers.slice(startIndex, endIndex).map(user => ({
       ...user,
       visible: user.visibility !== undefined ? user.visibility : (user.visible !== undefined ? user.visible : true)
     }));
     
-    // Calcular el total de usuarios y páginas
+    // Calcular el total d'usuaris i pàgines
     this.totalUsers = this.allMockUsers.length;
     this.totalPages = Math.ceil(this.totalUsers / this.itemsPerPage);
   }
@@ -135,7 +130,7 @@ export class BackOfficeComponent implements OnInit {
       return;
     }
     this.currentPage = page;
-    this.obtenerUsuarios();
+    this.getUsers();
   }
 
   showCreateUserForm(): void {
@@ -145,35 +140,35 @@ export class BackOfficeComponent implements OnInit {
     this.selectedUser = null;
   }
 
-  editarUsuario(user: User): void {
-    console.log('Editar usuario:', user);
-    this.selectedUser = { ...user }; // Crear una copia para no modificar el original directamente
+  updateUser(user: User): void {
+    console.log('Editar usuari:', user);
+    this.selectedUser = { ...user }; // Crear una copia per no modificar l'original directament
     this.showEditModal = true;
     this.showCreateModal = false;
     this.showViewModal = false;
   }
 
-  marcarUsuarioInvisible(user: User): void {
+  updateUserVisibility(user: User): void {
     const dialogRef = this.dialog.open(ConfirmDialogComponent, {
-      data: { message: `¿Estás seguro de que deseas ${user.visible ? 'ocultar' : 'mostrar'} el usuario ${user.username}?` }
+      data: { message: `Estàs segur de que vols ${user.visible ? 'ocultar' : 'mostrar'} l'usuari ${user.username}?` }
     });
   
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
         this.loading = true;
         
-        // Llamamos a nuestro servicio para cambiar la visibilidad en el backend
+        // Cridem al servei per canviar la visibilitat en la base de dades
         this.userService.toggleUserVisibility(user._id).subscribe({
           next: (response) => {
-            console.log(`Usuario ${user._id} ${response.user.visibility ? 'visible' : 'ocultado'}`);
-            // Actualizamos ambas propiedades para mantener consistencia
+            console.log(`Usuari ${user._id} ${response.user.visibility ? 'visible' : 'ocultat'}`);
+            // Actualitzem les dues propietats per mantenir consistència
             user.visible = response.user.visibility;
             user.visibility = response.user.visibility;
             this.loading = false;
           },
           error: (error) => {
-            console.error('Error al cambiar visibilidad del usuario:', error);
-            this.error = 'Error al cambiar la visibilidad del usuario';
+            console.error("Error al canviar la visibilitat de l'usuari:", error);
+            this.error = "Error al canviar la visibilitat de l'usuari";
             this.loading = false;
           }
         });
@@ -181,21 +176,21 @@ export class BackOfficeComponent implements OnInit {
     });
   }
 
-  eliminarUsuario(user: User): void {
-    console.log('Eliminar usuario:', user);
+  deleteUser(user: User): void {
+    console.log('Eliminar usuari:', user);
     const dialogRef = this.dialog.open(ConfirmDialogComponent, {
-      data: { message: `¿Estás seguro de que deseas eliminar el usuario ${user.username}?` }
+      data: { message: `Estás segur de que vols eliminar l'usuari ${user.username}?` }
     });
 
-    // Borrar las actividades asociadas al usuario
+    //Borrar les activitats associades a l'usuari
     if (user.activities) {
       user.activities.forEach(activityId => {
         this.activityService.deleteActivity(activityId).subscribe({
           next: () => {
-            console.log(`Actividad ${activityId} eliminada`);
+            console.log(`Activitat ${activityId} eliminada`);
           },
           error: (error) => {
-            console.error('Error al eliminar actividad:', error);
+            console.error("Error al eliminar l'activitat:", error);
           }
         });
       });
@@ -205,65 +200,65 @@ export class BackOfficeComponent implements OnInit {
       if (result) {
         this.userService.deleteUser(user._id).subscribe({
           next: () => {
-            console.log(`Usuario ${user._id} eliminado`);
+            console.log(`Usuari ${user._id} eliminat`);
             
-            // Eliminar el usuario de nuestros datos de prueba también
+            // Borrem l'usuari de la llista de prova
             const index = this.allMockUsers.findIndex(u => u._id === user._id);
             if (index !== -1) {
               this.allMockUsers.splice(index, 1);
             }
             
-            this.obtenerUsuarios(); // Recargar la lista después de eliminar
+            this.getUsers();
           },
           error: (error) => {
-            console.error('Error al eliminar usuario:', error);
+            console.error("Error al eliminar l'usuari:", error);
           }
         });
       }
     });
   }
 
-  verDetallesUsuario(user: User): void {
-    console.log('Ver detalles de usuario:', user);
-    this.selectedUser = { ...user }; // Crear una copia para no modificar el original
+  getUserDetails(user: User): void {
+    console.log("Veure detalls de l'usuari:", user);
+    this.selectedUser = { ...user }; // Crear una copia per no modificar l'usuari
     this.showViewModal = true;
     this.showEditModal = false;
     this.showCreateModal = false;
 
-    // Fetch activity details
-  if (this.selectedUser.activities && this.selectedUser.activities.length > 0 && user.activities) {
-    this.selectedUser.activities = []; // Clear existing activities
-    user.activities.forEach(activityId => {
-      this.activityService.getActivityById(activityId).subscribe({
-        next: (activity) => {
-          this.selectedUser?.activities?.push(activity); // Add full activity object
-        },
-        error: (error) => {
-          console.error(`Error fetching activity ${activityId}:`, error);
-        }
+    // Obtenir els detalls de les activitats
+    if (this.selectedUser.activities && this.selectedUser.activities.length > 0 && user.activities) {
+      this.selectedUser.activities = []; // Inicialitzem l'array de les activitats
+      user.activities.forEach(activityId => {
+        this.activityService.getActivityById(activityId).subscribe({
+          next: (activity) => {
+            this.selectedUser?.activities?.push(activity); // Possem l'objecte d'activitat a l'array
+          },
+          error: (error) => {
+            console.error(`Error obtenint l'activitat ${activityId}:`, error);
+          }
+        });
       });
-    });
-  }
+    }
   }
 
   onUserCreated(success: boolean): void {
     this.showCreateModal = false;
     if (success) {
-      this.obtenerUsuarios(); // Recargar la lista después de crear un nuevo usuario
+      this.getUsers();
     }
   }
 
   onUserEdited(success: boolean): void {
     if (success && this.selectedUser) {
-      // Actualizar el usuario en el backend
+      // Actualitzar l'usuari en el backend
       this.userService.updateUser(this.selectedUser._id, this.selectedUser).subscribe({
         next: () => {
-          console.log(`Usuario ${this.selectedUser?._id} actualizado correctamente`);
+          console.log(`Usuari ${this.selectedUser?._id} actualitzat correctament.`);
           this.showEditModal = false;
-          this.obtenerUsuarios(); // Recargar la lista
+          this.getUsers();
         },
         error: (error) => {
-          console.error('Error al actualizar usuario:', error);
+          console.error("Error al actualitzar l'usuari:", error);
         }
       });
     } else {

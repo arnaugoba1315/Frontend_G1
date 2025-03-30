@@ -43,13 +43,13 @@ ngOnInit(): void {
 
     this.authService.login(loginData).subscribe({
       next: (response) => {
-        console.log('Login exitoso:', response);
+        console.log('Inici de sessió satisfactori:', response);
         this.exportLoggedIn.emit(true);
       
       },
       error: (error) => {
-        console.error('Error en el login:', error);
-        alert('Error en el login, verifica tus credenciales');
+        console.error("Error en l'inici de sessió:", error);
+        alert("Error en l'inici de sessió, comprova les teves credencials.");
       }
     });
   }

@@ -8,7 +8,7 @@
   
   <!-- Inicialment només mostrar botó d'inicialitzar -->
   <div class="button-container" *ngIf="!activitiesListed">
-    <button class="btn-listar" (click)="obtenerActividades()">
+    <button class="btn-load" (click)="obtenerActividades()">
       Llistar totes les activitats
     </button>
   </div>
@@ -19,7 +19,7 @@
     
     <!-- Filtre per tipus d'activitat -->
     <div class="filter-container">
-      <label for="activity-type">Filtrar por tipus:</label>
+      <label for="activity-type">Filtrar per tipus:</label>
       <select id="activity-type" [(ngModel)]="selectedType" (change)="filterActivities()">
         <option value="">Tots</option>
         <option value="running">Running</option>
@@ -29,7 +29,7 @@
       </select>
     </div>
     
-    <!-- Grid container for activities -->
+    <!-- Contenidor de quadrícules per les activitats -->
     <div class="activities-grid">
       <div *ngFor="let activity of paginatedActivities; trackBy: trackByActivityId" 
           class="activity-card">
@@ -107,7 +107,7 @@
     <app-activity-create (activityCreated)="onActivityCreated($event)"></app-activity-create>
   </div>
 
-  <!-- Editar activitat - NUEVO DISEÑO RESPONSIVE -->
+  <!-- Editar activitat -->
   <div class="full-screen-form" *ngIf="showEditModal && selectedActivity">
     <div class="edit-modal">
       <div class="edit-modal-header">
@@ -186,15 +186,15 @@
   <div class="full-screen-form view-details" *ngIf="showViewModal && selectedActivity">
     <div class="modal-content">
       <div class="modal-header">
-        <h2>Detalls de l'Activitat</h2>
+        <h2>Detalls de l'activitat</h2>
         <button class="close-btn" (click)="closeViewModal()">×</button>
       </div>
       
       <div class="modal-body activity-details">
-        <!-- Indicador de carga -->
+        <!-- Indicador de càrrega -->
         <div *ngIf="loading" class="loading-indicator">
           <div class="spinner"></div>
-          <p>Cargando detalles de la actividad...</p>
+          <p>Carregant detalls de l'activitat...</p>
         </div>
       
         <div class="activity-profile">
@@ -243,7 +243,7 @@
           </div>
           
           <div class="detail-item">
-            <div class="detail-label">Desnivell positiu:</div>
+            <div class="detail-label">Desnivell positiu (metres):</div>
             <div class="detail-value">{{ selectedActivity.elevationGain }} m</div>
           </div>
           
@@ -253,7 +253,7 @@
           </div>
           
           <div class="detail-item">
-            <div class="detail-label">Calories cremades:</div>
+            <div class="detail-label">Calories cremades (metres):</div>
             <div class="detail-value">{{ selectedActivity.caloriesBurned || 'No especificado' }}</div>
           </div>
           
