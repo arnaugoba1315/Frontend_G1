@@ -20,13 +20,13 @@ export class LoginComponent implements OnInit {
   constructor(private form: FormBuilder){
     this.formLogin = this.form.group({
       username: ['', [Validators.required]],
-      password: ['', [Validators.required, Validators.minLength(8)]], 
+      password: ['', [Validators.required, Validators.minLength(6)]], 
     });
   }
 ngOnInit(): void {
     this.formLogin = this.form.group({
       username: ['', [Validators.required]],
-      password: ['', [Validators.required, Validators.minLength(8)]]
+      password: ['', [Validators.required, Validators.minLength(6)]]
     });
   }
   hasError(controlName:string, errorType:string){

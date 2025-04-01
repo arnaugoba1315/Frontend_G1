@@ -7,13 +7,14 @@ import { MatDialog } from '@angular/material/dialog';
 import { ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog.component';
 import { Activity } from '../models/activity.model';
 import { ActivityCreateComponent } from '../components/activity-create/activity-create.component';
+import { ActivityHistoryComponent } from '../activity-history/activity-history.component';
 
 @Component({
   selector: 'app-activities',
   templateUrl: './backoffice-activity.component.html',
   styleUrls: ['./backoffice-activity.component.css'],
   standalone: true,
-  imports: [CommonModule, FormsModule, ActivityCreateComponent]
+  imports: [CommonModule, FormsModule, ActivityCreateComponent, ActivityHistoryComponent]
 })
 export class ActivitiesComponent implements OnInit {
   activities: any[] = [];
@@ -34,7 +35,20 @@ export class ActivitiesComponent implements OnInit {
   
   formattedStartTime: string = '';
   formattedEndTime: string = '';
+
+  selectedActivityForHistory: string | null = null;
+  showHistoryModal = false;
   
+  openActivityHistory(activityId: string): void {
+    console.log('Opening history for:', activityId); // For debugging
+    this.selectedActivityForHistory = activityId;
+    this.showHistoryModal = true;
+  }
+
+  closeHistoryModal(): void {
+    this.showHistoryModal = false;
+    this.selectedActivityForHistory = null;
+  }
   // Dades d'exemple
   allMockActivities: any[] = [
     { 

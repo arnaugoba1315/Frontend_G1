@@ -52,9 +52,14 @@
           <button class="btn-view" (click)="getActivityDetails(activity)">
             <i class="material-icons">visibility</i> Detalls
           </button>
+          <button class="btn-history" (click)="openActivityHistory(activity._id)">
+            <i class="material-icons">history</i> Historial
+          </button>
         </div>
       </div>
     </div>
+
+
 
     <!-- Missatge si no hi ha activitats -->
     <div *ngIf="filteredActivities.length === 0" class="no-activities">
@@ -270,4 +275,23 @@
       </div>
     </div>
   </div>
+  
+         <!-- Añade el modal del historial -->
+  <div class="history-modal" *ngIf="showHistoryModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Historial de Cambios</h2>
+        <button type="button" class="close-btn" (click)="closeHistoryModal()">
+          &times;
+        </button>
+      </div>
+      <div class="modal-body">
+        <app-activity-history 
+          [activityId]="selectedActivityForHistory"
+          *ngIf="selectedActivityForHistory">
+        </app-activity-history>
+      </div>
+    </div>
+  </div>
 </div>
+

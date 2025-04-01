@@ -1,0 +1,50 @@
+.activity-history-container {
+    padding: 15px;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    margin-top: 20px;
+  }
+  
+  .loading-spinner {
+    display: flex;
+    justify-content: center;
+    padding: 20px;
+  }
+  
+  .no-history {
+    text-align: center;
+    padding: 20px;
+    font-style: italic;
+    color: #6c757d;
+  }
+  
+  .history-list {
+    margin-top: 15px;
+  }
+  
+  .history-details {
+    background-color: rgba(0, 0, 0, 0.03);
+    padding: 15px;
+  }
+  
+  pre {
+    background-color: white;
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+    padding: 10px;
+    font-size: 12px;
+    max-height: 200px;
+    overflow: auto;
+  }
+  
+  .pagination {
+    margin-top: 20px;
+  }
+  
+  .pagination .page-link {
+    cursor: pointer;
+  }
+  
+  .badge {
+    padding: 6px 10px;
+  }
