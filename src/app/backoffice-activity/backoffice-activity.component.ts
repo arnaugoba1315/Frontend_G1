@@ -417,29 +417,6 @@ export class ActivitiesComponent implements OnInit {
       this.getActivities(); // Recargar la llista després de crear una nova activitat
     }
   }
-
-  onActivityEdited(success: boolean): void {
-    if (success && this.selectedActivity) {
-      // Actualitzar dates des dels camps formatejats
-      this.selectedActivity.startTime = new Date(this.formattedStartTime);
-      this.selectedActivity.endTime = new Date(this.formattedEndTime);
-      
-      // Actualitzar l'activitat en la base de dades
-      this.activityService.updateActivity(this.selectedActivity._id, this.selectedActivity).subscribe({
-        next: () => {
-          console.log(`Activitat ${this.selectedActivity?._id} actualitzada correctament`);
-          this.showEditModal = false;
-          this.getActivities();
-        },
-        error: (error) => {
-          console.error("Error a l'actualizar l'activitat:", error);
-        }
-      });
-    } else {
-      this.showEditModal = false;
-    }
-  }
-
   closeViewModal(): void {
     this.showViewModal = false;
     this.selectedActivity = null;
@@ -460,16 +437,52 @@ export class ActivitiesComponent implements OnInit {
       return `${mins}min`;
     }
   }
-  
-  // Formatejar la data per input datetime-local
-  formatDateTimeForInput(dateStr: string): string {
-    // Convertir la data de string a objecte Date
-    const date = new Date(dateStr);
-    
-    // Format YYYY-MM-DDThh:mm 
-    return date.toISOString().slice(0, 16);
-  }
+
+ 
   trackByActivityId(index: number, activity: any): string {
     return activity._id;
+  }
+  formatDateTimeForInput(dateStr: string | Date): string {
+    if (!dateStr) return '';
+    
+    // Convertir a objeto Date si es string
+    const date = typeof dateStr === 'string' ? new Date(dateStr) : dateStr;
+    
+    // Obtener año, mes, día, hora y minutos
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0'); // +1 porque getMonth() devuelve 0-11
+    const day = String(date.getDate()).padStart(2, '0');
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    
+    // Formato YYYY-MM-DDThh:mm (compatible con input datetime-local)
+    return `${year}-${month}-${day}T${hours}:${minutes}`;
+  }
+  
+  // Cuando se procesa la edición, modifica la función onActivityEdited de esta manera:
+  onActivityEdited(success: boolean): void {
+    if (success && this.selectedActivity) {
+      // Preparar el objeto para actualización, creando nuevas instancias de Date
+      // para startTime y endTime a partir de los campos formateados
+      const updateData = {
+        ...this.selectedActivity,
+        startTime: this.formattedStartTime ? new Date(this.formattedStartTime) : this.selectedActivity.startTime,
+        endTime: this.formattedEndTime ? new Date(this.formattedEndTime) : this.selectedActivity.endTime,
+      };
+      
+      // Actualizar la actividad en la base de datos
+      this.activityService.updateActivity(this.selectedActivity._id, updateData).subscribe({
+        next: (updatedActivity) => {
+          console.log(`Actividad ${this.selectedActivity?._id} actualizada correctamente`, updatedActivity);
+          this.showEditModal = false;
+          this.getActivities();
+        },
+        error: (error) => {
+          console.error("Error al actualizar la actividad:", error);
+        }
+      });
+    } else {
+      this.showEditModal = false;
+    }
   }
 }

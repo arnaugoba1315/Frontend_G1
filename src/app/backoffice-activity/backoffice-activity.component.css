@@ -686,4 +686,37 @@ background-color: #43a047;
 .history-modal .close-btn:hover {
   color: #dc3545;
 }
+/* Estilo para el botón de historial consistente con los otros botones */
+.btn-history {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 13px;
+  transition: background-color 0.3s;
+  background-color: #673AB7; /* Color púrpura igual que el tema principal */
+  color: white;
+}
+
+.btn-history:hover {
+  opacity: 0.9;
+}
+
+.btn-history .material-icons {
+  margin-right: 4px;
+  font-size: 16px;
+}
+
+/* Actualización de la estructura en la activity-actions */
+.activity-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr; /* Cambiado de 3 a 4 columnas */
+  gap: 8px;
+  padding: 15px;
+  background-color: #f9f9f9;
+  border-top: 1px solid #e0e0e0;
+}
 
