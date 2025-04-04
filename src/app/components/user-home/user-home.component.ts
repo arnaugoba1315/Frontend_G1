@@ -3,7 +3,6 @@ import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 
-
 @Component({
   selector: 'app-user-home',
   standalone: true,
@@ -20,22 +19,42 @@ export class UserHomeComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    this.user = this.authService.currentUser;
+    // Obtener el usuario actual del servicio de autenticación
+    this.user = JSON.parse(localStorage.getItem('currentUser') || '{}');
     
-    // Si no hay usuario autenticado o es admin, redirigir a la página correspondiente
-    if (!this.user) {
+    // Verificar si hay usuario autenticado
+    if (!this.user || !this.user.id) {
+      console.log('No hay usuario autenticado, redirigiendo a login');
       this.router.navigate(['/login']);
-    } else if (this.user.role === 'admin') {
+      return;
+    }
+    
+    console.log('Usuario cargado en user-home:', this.user);
+    
+    // Si es admin, redirigir al panel de administración
+    if (this.user.role === 'admin') {
+      console.log('Usuario es admin, redirigiendo a panel admin');
       this.router.navigate(['/admin']);
     }
   }
 
   goToProfile(): void {
-    this.router.navigate(['/profile']);
+    // Registrar el intento de navegación para depuración
+    console.log('Intentando navegar a /user-profile');
+    
+    // Navegación directa a la ruta correcta
+    this.router.navigateByUrl('/user-profile').then(success => {
+      console.log('Resultado de navegación:', success ? 'éxito' : 'fallo');
+    }).catch(error => {
+      console.error('Error en navegación:', error);
+    });
   }
 
   logout(): void {
+    console.log('Cerrando sesión...');
     this.authService.logout();
-    // La redirección la maneja el servicio de autenticación
+    
+    // Asegurar redirección manual a login
+    this.router.navigateByUrl('/login');
   }
 }

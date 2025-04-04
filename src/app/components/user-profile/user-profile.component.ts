@@ -5,8 +5,6 @@ import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { UserService } from '../../services/user.service';
 
-
-
 @Component({
   selector: 'app-user-profile',
   standalone: true,
@@ -37,31 +35,50 @@ export class UserProfileComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.user = this.authService.currentUser;
-    
-    // Si no hay usuario autenticado, redirigir al login
-    if (!this.user) {
+    // Obtener el usuario actual del localStorage
+    const storedUser = localStorage.getItem('currentUser');
+    if (!storedUser) {
+      console.log('No hay usuario autenticado, redirigiendo a login');
       this.router.navigate(['/login']);
       return;
     }
     
-    // Cargar los detalles completos del usuario
-    this.loadUserDetails();
+    try {
+      // Parsear el usuario almacenado en localStorage
+      this.user = JSON.parse(storedUser);
+      console.log('Usuario cargado del localStorage:', this.user);
+      
+      // Verificar que tengamos un ID válido
+      if (!this.user.id) {
+        console.error('ID de usuario no encontrado en localStorage');
+        this.error = 'Error al obtener la información del usuario';
+        return;
+      }
+      
+      // Cargar los detalles del usuario desde el servidor
+      this.loadUserDetails(this.user.id);
+    } catch (error) {
+      console.error('Error al parsear datos de usuario:', error);
+      this.error = 'Error al procesar la información del usuario';
+      this.router.navigate(['/login']);
+    }
   }
 
-  loadUserDetails(): void {
+  loadUserDetails(userId: string): void {
     this.loading = true;
+    console.log('Cargando detalles del usuario con ID:', userId);
     
-    // Usamos el ID del usuario actual para cargar sus detalles completos
-    this.userService.getUserById(this.user.id).subscribe({
+    // Usar el ID del usuario para cargar sus detalles completos
+    this.userService.getUserById(userId).subscribe({
       next: (userData) => {
+        console.log('Datos de usuario recibidos:', userData);
         this.user = userData;
         this.loading = false;
         
         // Actualizar el formulario con los datos del usuario
         this.profileForm.patchValue({
-          username: userData.username,
-          email: userData.email,
+          username: userData.username || '',
+          email: userData.email || '',
           bio: userData.bio || '',
           profilePicture: userData.profilePicture || ''
         });
@@ -80,8 +97,8 @@ export class UserProfileComponent implements OnInit {
     if (!this.editMode) {
       // Restablecer el formulario si se cancela la edición
       this.profileForm.patchValue({
-        username: this.user.username,
-        email: this.user.email,
+        username: this.user.username || '',
+        email: this.user.email || '',
         bio: this.user.bio || '',
         profilePicture: this.user.profilePicture || ''
       });
@@ -117,10 +134,9 @@ export class UserProfileComponent implements OnInit {
         this.user = response.user;
         this.editMode = false;
         
-        // Actualizar el usuario en el servicio de autenticación
-        const currentUser = this.authService.currentUser;
+        // Actualizar el usuario en el localStorage
         const updatedUser = {
-          ...currentUser,
+          ...this.user,
           username: response.user.username,
           email: response.user.email,
           profilePicture: response.user.profilePicture
@@ -136,11 +152,11 @@ export class UserProfileComponent implements OnInit {
   }
 
   goToHome(): void {
-    this.router.navigate(['/home']);
+    this.router.navigate(['/user-home']);
   }
 
   logout(): void {
     this.authService.logout();
-    // La redirección la maneja el servicio de autenticación
+    // La redirección al login se maneja en el servicio de autenticación
   }
 }

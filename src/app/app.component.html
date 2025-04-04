@@ -2,16 +2,16 @@
     <h1></h1>
   </div>
   
-  <!-- Mostrar el componente correspondiente según el estado de autenticación -->
+  <!-- Verificar si está logueado y redirigir según el rol -->
   <div *ngIf="loggedin; else notLoggedIn">
     <div *ngIf="isAdmin; else userView">
       <app-backoffice></app-backoffice>
     </div>
+    <ng-template #userView>
+      <!-- Usar router-outlet para la navegación dentro de la vista de usuario -->
+      <router-outlet></router-outlet>
+    </ng-template>
   </div>
-  
-  <ng-template #userView>
-    <app-user-home></app-user-home>
-  </ng-template>
   
   <ng-template #notLoggedIn>
     <app-register></app-register>

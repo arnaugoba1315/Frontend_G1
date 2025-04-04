@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { tap } from 'rxjs/operators';
+import { Router } from '@angular/router';
 
 @Injectable({
   providedIn: 'root'
@@ -11,11 +12,11 @@ export class AuthService {
   private currentUserSubject = new BehaviorSubject<any>(null);
   public currentUser = this.currentUserSubject.asObservable();
 
-  constructor(private http: HttpClient) {
-    const storedUser = localStorage.getItem('currentUser');
-    if (storedUser) {
-      this.currentUserSubject.next(JSON.parse(storedUser));
-    }
+  constructor(
+    private http: HttpClient,
+    private router: Router // Añadimos el Router para poder redirigir
+  ) {
+    this.checkLoginStatus();
   }
 
   isLoggedIn(): boolean {
@@ -41,17 +42,12 @@ export class AuthService {
   logout() {
     localStorage.removeItem('currentUser');
     this.currentUserSubject.next(null);
+    // Añadimos redirección al login
+    this.router.navigate(['/login']);
   }
   
   register(registerData: { username: string; email: string; password: string }): Observable<any> {
-    // Add role explicitly to ensure it's set to 'user'
-    const dataWithRole = {
-      ...registerData,
-      role: 'user'
-    };
-    
-    // Use /api/users instead of /api/users/register
-    return this.http.post(`${this.apiUrl}users`, dataWithRole);
+    return this.http.post(`${this.apiUrl}users/register`, registerData);
   }
   
   checkLoginStatus(): void {

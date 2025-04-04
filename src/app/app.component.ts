@@ -5,6 +5,7 @@ import { LoginComponent } from './login/login.component';
 import { RegisterComponent } from './register/register.component';
 import { BackOfficeComponent } from './backoffice/backoffice.component';
 import { UserHomeComponent } from './components/user-home/user-home.component';
+import { UserProfileComponent } from './components/user-profile/user-profile.component'; // Añadido UserProfileComponent
 
 @Component({
   selector: 'app-root',
@@ -17,7 +18,8 @@ import { UserHomeComponent } from './components/user-home/user-home.component';
     LoginComponent,
     RegisterComponent,
     BackOfficeComponent,
-    UserHomeComponent
+    UserHomeComponent,
+    UserProfileComponent // Importado UserProfileComponent
   ]
 })
 export class AppComponent {
