@@ -1,20 +1,38 @@
 import { Component } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
-import { BackOfficeComponent } from "./backoffice/backoffice.component";
-import { LoginComponent } from "./login/login.component";
-import { RegisterComponent } from "./register/register.component";
+import { RouterModule } from '@angular/router';
+import { CommonModule } from '@angular/common';
+import { LoginComponent } from './login/login.component';
+import { RegisterComponent } from './register/register.component';
+import { BackOfficeComponent } from './backoffice/backoffice.component';
+import { UserHomeComponent } from './components/user-home/user-home.component';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, BackOfficeComponent, LoginComponent, RegisterComponent],
   templateUrl: './app.component.html',
-  styleUrl: './app.component.css',
-  standalone: true
-  
+  styleUrls: ['./app.component.css'],
+  standalone: true,
+  imports: [
+    CommonModule,
+    RouterModule,
+    LoginComponent,
+    RegisterComponent,
+    BackOfficeComponent,
+    UserHomeComponent
+  ]
 })
 export class AppComponent {
   loggedin: boolean = false;
-  getLoggedIn(loggedin: boolean){
-    this.loggedin = loggedin;
+  isAdmin: boolean = false;
+
+  // Método para manejar el evento exportLoggedIn
+  getLoggedIn(loggedIn: boolean) {
+    this.loggedin = loggedIn;
+
+    if (loggedIn) {
+      const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+      this.isAdmin = currentUser?.role === 'admin';
+    } else {
+      this.isAdmin = false;
+    }
   }
 }
