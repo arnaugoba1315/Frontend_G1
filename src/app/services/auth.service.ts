@@ -42,9 +42,18 @@ export class AuthService {
     localStorage.removeItem('currentUser');
     this.currentUserSubject.next(null);
   }
+  
   register(registerData: { username: string; email: string; password: string }): Observable<any> {
-    return this.http.post(`${this.apiUrl}users/register`, registerData);
+    // Add role explicitly to ensure it's set to 'user'
+    const dataWithRole = {
+      ...registerData,
+      role: 'user'
+    };
+    
+    // Use /api/users instead of /api/users/register
+    return this.http.post(`${this.apiUrl}users`, dataWithRole);
   }
+  
   checkLoginStatus(): void {
     const storedUser = localStorage.getItem('currentUser');
     if (storedUser) {

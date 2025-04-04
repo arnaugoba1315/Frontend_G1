@@ -9,7 +9,7 @@ import { CommonModule } from '@angular/common';
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.css'],
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule] // Agregar ReactiveFormsModule para usar formGroup
+  imports: [CommonModule, ReactiveFormsModule]
 })
 export class LoginComponent {
   @Output() exportLoggedIn = new EventEmitter<boolean>();
@@ -44,9 +44,11 @@ export class LoginComponent {
     this.error = '';
 
     const credentials = this.formLogin.value;
+    console.log('Attempting login with credentials:', credentials);
 
     this.authService.login(credentials).subscribe({
       next: (response) => {
+        console.log('Login successful:', response);
         this.loading = false;
         this.exportLoggedIn.emit(true);
 
@@ -60,6 +62,7 @@ export class LoginComponent {
         }
       },
       error: (error) => {
+        console.error('Login error:', error);
         this.loading = false;
         this.error = error.error?.message || 'Error en el inicio de sesión';
       }
